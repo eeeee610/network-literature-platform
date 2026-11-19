@@ -1,0 +1,23 @@
+# OS
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# 日志与临时文件
+*.log
+*.tmp
+*.bak
+
+# 数据库本地导出（如果有）
+*.sql.gz
+*.dump
+
+# 环境配置/密码（如果后续有）
+.env
+config.local.*
