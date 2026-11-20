@@ -53,8 +53,8 @@
         <mxCell id="user_account_f3" value="       created_at / updated_at" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;" vertex="1" parent="user_account">
           <mxGeometry x="0" y="72" width="360" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="user_bookshelf" value="user_bookshelf  书架表" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;rounded=1;fillColor=#38761D;swimlaneFillColor=#D9EAD3;strokeColor=#82B366;fontColor=#FFFFFF;fontSize=13;fontFamily=Microsoft YaHei;" vertex="1" parent="1">
-          <mxGeometry x="520" y="300" width="360" height="156" as="geometry" />
+        <mxCell id="user_bookshelf" value="user_bookshelf  书架/收藏表" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;rounded=1;fillColor=#38761D;swimlaneFillColor=#D9EAD3;strokeColor=#82B366;fontColor=#FFFFFF;fontSize=13;fontFamily=Microsoft YaHei;" vertex="1" parent="1">
+          <mxGeometry x="520" y="300" width="360" height="176" as="geometry" />
         </mxCell>
         <mxCell id="user_bookshelf_f1" value="PK/FK  user_id" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;" vertex="1" parent="user_bookshelf">
           <mxGeometry x="0" y="32" width="360" height="20" as="geometry" />
@@ -71,8 +71,11 @@
         <mxCell id="user_bookshelf_f5" value="       is_top" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;" vertex="1" parent="user_bookshelf">
           <mxGeometry x="0" y="112" width="360" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="user_bookshelf_f6" value="       created_at / updated_at" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;" vertex="1" parent="user_bookshelf">
+        <mxCell id="user_bookshelf_f5b" value="       is_notify" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;" vertex="1" parent="user_bookshelf">
           <mxGeometry x="0" y="132" width="360" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="user_bookshelf_f6" value="       created_at / updated_at" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;" vertex="1" parent="user_bookshelf">
+          <mxGeometry x="0" y="152" width="360" height="20" as="geometry" />
         </mxCell>
         <mxCell id="chapter_subscription" value="chapter_subscription  订阅记录表" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;rounded=1;fillColor=#674EA7;swimlaneFillColor=#E4DFEC;strokeColor=#9673A6;fontColor=#FFFFFF;fontSize=13;fontFamily=Microsoft YaHei;" vertex="1" parent="1">
           <mxGeometry x="520" y="620" width="380" height="216" as="geometry" />

@@ -149,21 +149,6 @@
         <mxCell id="novel_rating_stat_f5" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;updated_at" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="novel_rating_stat">
           <mxGeometry x="0" y="112" width="340" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="novel_favorite" value="novel_favorite  小说收藏表" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;rounded=1;fillColor=#674EA7;swimlaneFillColor=#E4DFEC;strokeColor=#9673A6;fontColor=#FFFFFF;fontSize=13;fontFamily=Microsoft YaHei;" vertex="1" parent="1">
-          <mxGeometry x="520" y="780" width="400" height="120" as="geometry" />
-        </mxCell>
-        <mxCell id="novel_favorite_f1" value="PK/FK&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;user_id" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="novel_favorite">
-          <mxGeometry x="0" y="32" width="400" height="20" as="geometry" />
-        </mxCell>
-        <mxCell id="novel_favorite_f2" value="PK/逻辑FK&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;novel_id" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="novel_favorite">
-          <mxGeometry x="0" y="52" width="400" height="20" as="geometry" />
-        </mxCell>
-        <mxCell id="novel_favorite_f3" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;is_notify" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="novel_favorite">
-          <mxGeometry x="0" y="72" width="400" height="20" as="geometry" />
-        </mxCell>
-        <mxCell id="novel_favorite_f4" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;created_at" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="novel_favorite">
-          <mxGeometry x="0" y="92" width="400" height="20" as="geometry" />
-        </mxCell>
         <mxCell id="ranking_config" value="ranking_config  榜单配置表" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;rounded=1;fillColor=#0B5394;swimlaneFillColor=#CFE2F3;strokeColor=#6FA8DC;fontColor=#FFFFFF;fontSize=13;fontFamily=Microsoft YaHei;" vertex="1" parent="1">
           <mxGeometry x="1080" y="780" width="340" height="240" as="geometry" />
         </mxCell>
@@ -262,20 +247,6 @@
         <mxCell id="rel_app_rating_tgt" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontFamily=Microsoft YaHei;labelBackgroundColor=#FFFFFF;fontColor=#B91C1C;" vertex="1" connectable="0" parent="rel_app_rating">
           <mxGeometry x="0.971" relative="1" as="geometry"><mxPoint as="offset" x="0.0" y="-13.0" /></mxGeometry>
         </mxCell>
-        <mxCell id="rel_app_favorite" value="收藏用户" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=none;endArrow=open;endFill=0;strokeWidth=1.5;fontSize=10;labelBackgroundColor=#FFFFFF;fontFamily=Microsoft YaHei;strokeColor=#2563EB;exitX=1;exitY=0.85;entryX=0;entryY=0.45;" edge="1" parent="1" source="app_user" target="novel_favorite">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="460" y="205" />
-              <mxPoint x="460" y="834" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="rel_app_favorite_src" value="1..1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontFamily=Microsoft YaHei;labelBackgroundColor=#FFFFFF;fontColor=#B91C1C;" vertex="1" connectable="0" parent="rel_app_favorite">
-          <mxGeometry x="0.02" relative="1" as="geometry"><mxPoint as="offset" x="0.0" y="-13.0" /></mxGeometry>
-        </mxCell>
-        <mxCell id="rel_app_favorite_tgt" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontFamily=Microsoft YaHei;labelBackgroundColor=#FFFFFF;fontColor=#B91C1C;" vertex="1" connectable="0" parent="rel_app_favorite">
-          <mxGeometry x="0.98" relative="1" as="geometry"><mxPoint as="offset" x="0.0" y="-13.0" /></mxGeometry>
-        </mxCell>
         <mxCell id="rel_comment_like" value="点赞评论" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=none;endArrow=open;endFill=0;strokeWidth=1.5;fontSize=10;labelBackgroundColor=#FFFFFF;fontFamily=Microsoft YaHei;strokeColor=#2563EB;exitX=1;exitY=0.15;entryX=0;entryY=0.3;" edge="1" parent="1" source="comment" target="comment_like">
           <mxGeometry relative="1" as="geometry">
           </mxGeometry>
@@ -358,20 +329,6 @@
         <mxCell id="rel_novel_rating_stat_tgt" value="0..1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontFamily=Microsoft YaHei;labelBackgroundColor=#FFFFFF;fontColor=#B91C1C;" vertex="1" connectable="0" parent="rel_novel_rating_stat">
           <mxGeometry x="0.98" relative="1" as="geometry"><mxPoint as="offset" x="0.0" y="-13.0" /></mxGeometry>
         </mxCell>
-        <mxCell id="rel_novel_favorite" value="收藏小说" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=none;endArrow=open;endFill=0;strokeWidth=1.5;fontSize=10;labelBackgroundColor=#FFFFFF;fontFamily=Microsoft YaHei;strokeColor=#9CA3AF;dashed=1;exitX=1;exitY=0.7;entryX=0;entryY=0.55;" edge="1" parent="1" source="novel" target="novel_favorite">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="440" y="490" />
-              <mxPoint x="440" y="846" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-        <mxCell id="rel_novel_favorite_src" value="1..1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontFamily=Microsoft YaHei;labelBackgroundColor=#FFFFFF;fontColor=#B91C1C;" vertex="1" connectable="0" parent="rel_novel_favorite">
-          <mxGeometry x="0.029" relative="1" as="geometry"><mxPoint as="offset" x="0.0" y="-13.0" /></mxGeometry>
-        </mxCell>
-        <mxCell id="rel_novel_favorite_tgt" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontFamily=Microsoft YaHei;labelBackgroundColor=#FFFFFF;fontColor=#B91C1C;" vertex="1" connectable="0" parent="rel_novel_favorite">
-          <mxGeometry x="0.971" relative="1" as="geometry"><mxPoint as="offset" x="0.0" y="-13.0" /></mxGeometry>
-        </mxCell>
         <mxCell id="rel_novel_ranking" value="入榜小说" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=none;endArrow=open;endFill=0;strokeWidth=1.5;fontSize=10;labelBackgroundColor=#FFFFFF;fontFamily=Microsoft YaHei;strokeColor=#9CA3AF;dashed=1;exitX=1;exitY=0.9;entryX=0;entryY=0.4;" edge="1" parent="1" source="novel" target="ranking_item">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
@@ -400,10 +357,10 @@
         <mxCell id="rel_ranking_item_tgt" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontFamily=Microsoft YaHei;labelBackgroundColor=#FFFFFF;fontColor=#B91C1C;" vertex="1" connectable="0" parent="rel_ranking_item">
           <mxGeometry x="0.932" relative="1" as="geometry"><mxPoint as="offset" x="0.0" y="0.0" /></mxGeometry>
         </mxCell>
-        <mxCell id="legend" value="&lt;b&gt;图例（UML 类图式 ER）&lt;/b&gt;&lt;br&gt;矩形 = 表：上栏表名，下栏字段；PK 主键 / FK 外键 / UK 唯一键&lt;br&gt;箭头 = 关联方向（子表 → 父表）；两端数字 = 基数（0..*、0..1、1..1）&lt;br&gt;实线 = C 内部物理外键；虚线 = A/B 外部逻辑外键&lt;br&gt;本子图 13 条关系均为二元关系，无三元及以上联系，故未使用菱形" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=12;spacingRight=12;spacingTop=8;fillColor=#FFFFFF;strokeColor=#CBD5E1;fontSize=10;fontColor=#334155;fontFamily=Microsoft YaHei;" vertex="1" parent="1">
+        <mxCell id="legend" value="&lt;b&gt;图例（UML 类图式 ER）&lt;/b&gt;&lt;br&gt;矩形 = 表：上栏表名，下栏字段；PK 主键 / FK 外键 / UK 唯一键&lt;br&gt;箭头 = 关联方向（子表 → 父表）；两端数字 = 基数（0..*、0..1、1..1）&lt;br&gt;实线 = C 内部物理外键；虚线 = A/B 外部逻辑外键&lt;br&gt;本子图 11 条关系均为二元关系，无三元及以上联系，故未使用菱形" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=12;spacingRight=12;spacingTop=8;fillColor=#FFFFFF;strokeColor=#CBD5E1;fontSize=10;fontColor=#334155;fontFamily=Microsoft YaHei;" vertex="1" parent="1">
           <mxGeometry x="40" y="1250" width="620" height="140" as="geometry" />
         </mxCell>
-        <mxCell id="external_note" value="&lt;b&gt;外部依赖（不在本子图建表）&lt;/b&gt;&lt;br&gt;user_id / reply_to_user_id → app_user.user_id（A，物理外键）&lt;br&gt;novel_id → novel.novel_id（B，逻辑外键）&lt;br&gt;chapter_id → chapter.chapter_id（B，逻辑外键）&lt;br&gt;待 B 章节表与 A 的 app_user 冻结后，统一启用物理外键。&lt;br&gt;&lt;br&gt;&lt;b&gt;边界说明&lt;/b&gt;&lt;br&gt;novel_favorite 只记录收藏/追更；阅读进度与书架由 A 的 user_bookshelf 维护。" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=12;spacingRight=12;spacingTop=8;fillColor=#F3F4F6;strokeColor=#9CA3AF;dashed=1;fontSize=10;fontColor=#374151;fontFamily=Microsoft YaHei;" vertex="1" parent="1">
+        <mxCell id="external_note" value="&lt;b&gt;外部依赖（不在本子图建表）&lt;/b&gt;&lt;br&gt;user_id / reply_to_user_id → app_user.user_id（A，物理外键）&lt;br&gt;novel_id → novel.novel_id（B，逻辑外键）&lt;br&gt;chapter_id → chapter.chapter_id（B，逻辑外键）&lt;br&gt;待 B 章节表与 A 的 app_user 冻结后，统一启用物理外键。&lt;br&gt;&lt;br&gt;&lt;b&gt;边界说明&lt;/b&gt;&lt;br&gt;书架/收藏、阅读进度与追更提醒统一由 A 的 user_bookshelf 维护；C 仅统计收藏量与收藏榜。" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=12;spacingRight=12;spacingTop=8;fillColor=#F3F4F6;strokeColor=#9CA3AF;dashed=1;fontSize=10;fontColor=#374151;fontFamily=Microsoft YaHei;" vertex="1" parent="1">
           <mxGeometry x="700" y="1250" width="620" height="200" as="geometry" />
         </mxCell>
       </root>

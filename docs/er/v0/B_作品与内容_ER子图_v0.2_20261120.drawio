@@ -1,0 +1,64 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="B_ER子图" id="b-er">
+    <mxGraphModel dx="1200" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="1300" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="user" value="&lt;div style=&#x27;font-weight:bold;text-align:center;padding:6px 4px;border-bottom:1px solid #C026D3&#x27;&gt;app_user 用户表&lt;/div&gt;&lt;div style=&#x27;padding:6px 8px;text-align:left;line-height:1.6;border-bottom:1px solid #C026D3&#x27;&gt;username&lt;br&gt;nickname&lt;br&gt;role&lt;br&gt;status&lt;/div&gt;&lt;div style=&#x27;padding:6px 8px;text-align:left;line-height:1.6&#x27;&gt;+user_id (PK)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FDF4FF;strokeColor=#C026D3;strokeWidth=2;align=center;verticalAlign=top;fontSize=12;fontColor=#1F2937;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="400" y="30" width="280" height="166" as="geometry" />
+        </mxCell>
+        <mxCell id="novel" value="&lt;div style=&#x27;font-weight:bold;text-align:center;padding:6px 4px;border-bottom:1px solid #16A34A&#x27;&gt;Novel 小说表&lt;/div&gt;&lt;div style=&#x27;padding:6px 8px;text-align:left;line-height:1.6;border-bottom:1px solid #16A34A&#x27;&gt;title&lt;br&gt;cover_url&lt;br&gt;description&lt;br&gt;status&lt;br&gt;audit_status&lt;br&gt;total_words&lt;br&gt;latest_chapter_id&lt;br&gt;created_at&lt;br&gt;updated_at&lt;/div&gt;&lt;div style=&#x27;padding:6px 8px;text-align:left;line-height:1.6&#x27;&gt;+novel_id (PK)&lt;br&gt;author_id (FK)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F0FDF4;strokeColor=#16A34A;strokeWidth=2;align=center;verticalAlign=top;fontSize=12;fontColor=#1F2937;" vertex="1" parent="1">
+          <mxGeometry x="40" y="330" width="300" height="320" as="geometry" />
+        </mxCell>
+        <mxCell id="chapter" value="&lt;div style=&#x27;font-weight:bold;text-align:center;padding:6px 4px;border-bottom:1px solid #7C3AED&#x27;&gt;Chapter 章节表&lt;/div&gt;&lt;div style=&#x27;padding:6px 8px;text-align:left;line-height:1.6;border-bottom:1px solid #7C3AED&#x27;&gt;chapter_no&lt;br&gt;title&lt;br&gt;content&lt;br&gt;is_vip&lt;br&gt;vip_price&lt;br&gt;word_count&lt;br&gt;status&lt;br&gt;audit_status&lt;br&gt;publish_time&lt;br&gt;created_at&lt;br&gt;updated_at&lt;/div&gt;&lt;div style=&#x27;padding:6px 8px;text-align:left;line-height:1.6&#x27;&gt;+chapter_id (PK)&lt;br&gt;novel_id (FK)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F5F3FF;strokeColor=#7C3AED;strokeWidth=2;align=center;verticalAlign=top;fontSize=12;fontColor=#1F2937;" vertex="1" parent="1">
+          <mxGeometry x="600" y="330" width="320" height="320" as="geometry" />
+        </mxCell>
+        <mxCell id="tag" value="&lt;div style=&#x27;font-weight:bold;text-align:center;padding:6px 4px;border-bottom:1px solid #EA580C&#x27;&gt;Tag 标签表&lt;/div&gt;&lt;div style=&#x27;padding:6px 8px;text-align:left;line-height:1.6;border-bottom:1px solid #EA580C&#x27;&gt;tag_name&lt;br&gt;is_active&lt;br&gt;created_at&lt;/div&gt;&lt;div style=&#x27;padding:6px 8px;text-align:left;line-height:1.6&#x27;&gt;+tag_id (PK)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFF7ED;strokeColor=#EA580C;strokeWidth=2;align=center;verticalAlign=top;fontSize=12;fontColor=#1F2937;" vertex="1" parent="1">
+          <mxGeometry x="40" y="860" width="260" height="144" as="geometry" />
+        </mxCell>
+        <mxCell id="novel_tag" value="&lt;div style=&#x27;font-weight:bold;text-align:center;padding:6px 4px;border-bottom:1px solid #0D9488&#x27;&gt;Novel_Tag 关联表&lt;/div&gt;&lt;div style=&#x27;padding:6px 8px;text-align:left;line-height:1.6;border-bottom:1px solid #0D9488&#x27;&gt;sort_order&lt;br&gt;created_at&lt;/div&gt;&lt;div style=&#x27;padding:6px 8px;text-align:left;line-height:1.6&#x27;&gt;+novel_id (PK, FK)&lt;br&gt;+tag_id (PK, FK)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#F0FDFA;strokeColor=#0D9488;strokeWidth=2;align=center;verticalAlign=top;fontSize=12;fontColor=#1F2937;" vertex="1" parent="1">
+          <mxGeometry x="600" y="860" width="320" height="144" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" value="创作" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#2563EB;strokeWidth=2;endArrow=block;endFill=1;endSize=8;fontSize=11;fontColor=#1F2937;" edge="1" parent="1" source="user" target="novel">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e1c1" value="1..1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontColor=#334155;labelBackgroundColor=#FFFFFF;" vertex="1" connectable="0" parent="e1">
+          <mxGeometry x="-0.85" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="e1c2" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontColor=#334155;labelBackgroundColor=#FFFFFF;" vertex="1" connectable="0" parent="e1">
+          <mxGeometry x="0.85" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="e2" value="包含" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#2563EB;strokeWidth=2;endArrow=block;endFill=1;endSize=8;fontSize=11;fontColor=#1F2937;exitX=1;exitY=0;entryX=0;entryY=0;" edge="1" parent="1" source="novel" target="chapter">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2c1" value="1..1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontColor=#334155;labelBackgroundColor=#FFFFFF;" vertex="1" connectable="0" parent="e2">
+          <mxGeometry x="-0.85" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="e2c2" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontColor=#334155;labelBackgroundColor=#FFFFFF;" vertex="1" connectable="0" parent="e2">
+          <mxGeometry x="0.85" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="e3" value="打标签" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#2563EB;strokeWidth=2;endArrow=block;endFill=1;endSize=8;fontSize=11;fontColor=#1F2937;exitX=1;exitY=1;entryX=0;entryY=0.5;" edge="1" parent="1" source="novel" target="novel_tag">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3c1" value="1..1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontColor=#334155;labelBackgroundColor=#FFFFFF;" vertex="1" connectable="0" parent="e3">
+          <mxGeometry x="-0.85" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="e3c2" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontColor=#334155;labelBackgroundColor=#FFFFFF;" vertex="1" connectable="0" parent="e3">
+          <mxGeometry x="0.85" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="e4" value="归类" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#2563EB;strokeWidth=2;endArrow=block;endFill=1;endSize=8;fontSize=11;fontColor=#1F2937;" edge="1" parent="1" source="tag" target="novel_tag">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4c1" value="1..1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontColor=#334155;labelBackgroundColor=#FFFFFF;" vertex="1" connectable="0" parent="e4">
+          <mxGeometry x="-0.85" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="e4c2" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=11;fontColor=#334155;labelBackgroundColor=#FFFFFF;" vertex="1" connectable="0" parent="e4">
+          <mxGeometry x="0.85" relative="1" as="geometry"><mxPoint as="offset" /></mxGeometry>
+        </mxCell>
+        <mxCell id="note" value="说明：本模块关系均为二元关系，无三元及以上联系，故不使用菱形；M:N 通过关联实体 Novel_Tag 拆分。审核与发布状态独立，章节审核通过后由作者手动发布。" style="text;html=1;align=left;verticalAlign=top;fontSize=11;fontColor=#64748B;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1180" width="880" height="40" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
