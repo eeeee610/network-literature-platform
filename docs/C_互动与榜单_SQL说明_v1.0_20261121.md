@@ -1,0 +1,150 @@
+# C 互动与榜单 · SQL 说明
+
+- 模块：C（互动与榜单）
+- 版本：v1.0
+- 日期：2026-11-21
+- 负责人：C
+- 依据：`docs/current/D_数据字典_v1.0_20261120.xlsx`（冻结基线）、`docs/current/er/全局_ER图_v1.0_20261120.drawio`
+- 数据库：MySQL 8.0+，InnoDB，utf8mb4 / utf8mb4_0900_ai_ci
+
+---
+
+## 1. 交付清单
+
+| 文件 | 目录 | 作用 |
+|---|---|---|
+| `C_互动与榜单_建表_v1.0_20261121.sql` | `sql/ddl/` | 6 张表、20 个索引、12 个外键及 CHECK 约束 |
+| `C_互动与榜单_触发器_v1.0_20261121.sql` | `sql/objects/` | 8 个触发器：点赞计数、评分统计、审核重审 |
+| `C_互动与榜单_视图与存储过程_v1.0_20261121.sql` | `sql/objects/` | 4 个视图 + 4 个存储过程 |
+| `C_互动与榜单_测试前置_v1.0_20261121.sql` | `test/` | 本地验证用的 A/B 最小前置表（不属交付基线） |
+| `C_互动与榜单_测试数据_v1.0_20261121.sql` | `test/` | 少量 INSERT + 触发器/视图/存储过程验证 |
+| `C_互动与榜单_执行结果_v1.0_20261121.md` | `test/` | 实际执行结果留档 |
+
+---
+
+## 2. 执行顺序与环境
+
+```text
+1) A_用户交易_建表_*.sql        -- 提供 app_user
+2) B_作品内容_建表_*.sql        -- 提供 novel / chapter
+3) sql/ddl/C_互动与榜单_建表_v1.0_20261121.sql
+4) sql/objects/C_互动与榜单_触发器_v1.0_20261121.sql
+5) sql/objects/C_互动与榜单_视图与存储过程_v1.0_20261121.sql
+```
+
+- 建表脚本用 `CREATE TABLE IF NOT EXISTS`，可重复执行；对象脚本先 `DROP ... IF EXISTS` 再创建。
+- 字符集统一 utf8mb4，避免书名、评论中的生僻字与表情符乱码。
+- 时间口径遵循数据字典：C 模块使用 `DATETIME`（A 模块为 `DATETIME(6)`）。
+
+---
+
+## 3. 表清单（6 表 / 50 字段 / 20 索引）
+
+| 表名 | 中文名 | 字段数 | 主键 | 二级索引 | 说明 |
+|---|---|---|---|---|---|
+| `comment` | 评论表 | 14 | `comment_id` | 5 | 整本书评、本章说、楼中楼；`parent_id` 自关联 |
+| `comment_like` | 评论点赞表 | 4 | `like_id` | 2（含 1 唯一） | `uk(comment_id,user_id)` 防重复点赞 |
+| `novel_rating` | 小说评分表 | 9 | `rating_id` | 3（含 1 唯一） | `uk(user_id,novel_id)` 一人一书一条 |
+| `novel_rating_stat` | 评分统计表 | 5 | `novel_id` | 0 | 与 novel 一对一，唯一权威评分统计 |
+| `ranking_config` | 榜单配置表 | 10 | `ranking_id` | 1（唯一） | `ranking_code` 唯一 |
+| `ranking_item` | 榜单条目表 | 8 | `item_id` | 4（含 2 唯一） | 同期同书唯一、同期名次唯一 |
+
+索引小计：数据字典《索引清单》共 20 个显式索引（含 6 个主键、5 个唯一键）。另外，`comment.reply_to_user_id` 在索引清单中未定义索引，MySQL 会为该外键自动建立隐式索引 `fk_comment_reply_user`，因此实际索引对象为 21 个，属数据库强制行为，不算偏离字典。
+
+---
+
+## 4. 外键依赖（12 个物理外键）
+
+| 约束名 | 子表.字段 | 父表.字段 | 删除策略 |
+|---|---|---|---|
+| `fk_comment_novel` | comment.novel_id | novel.novel_id | RESTRICT / CASCADE(update) |
+| `fk_comment_chapter` | comment.chapter_id | chapter.chapter_id | RESTRICT |
+| `fk_comment_user` | comment.user_id | app_user.user_id | RESTRICT |
+| `fk_comment_parent` | comment.parent_id | comment.comment_id（自关联） | RESTRICT |
+| `fk_comment_reply_user` | comment.reply_to_user_id | app_user.user_id | RESTRICT |
+| `fk_comment_like_comment` | comment_like.comment_id | comment.comment_id | RESTRICT |
+| `fk_comment_like_user` | comment_like.user_id | app_user.user_id | RESTRICT |
+| `fk_novel_rating_user` | novel_rating.user_id | app_user.user_id | RESTRICT |
+| `fk_novel_rating_novel` | novel_rating.novel_id | novel.novel_id | RESTRICT |
+| `fk_rating_stat_novel` | novel_rating_stat.novel_id | novel.novel_id | RESTRICT |
+| `fk_ranking_item_config` | ranking_item.ranking_id | ranking_config.ranking_id | RESTRICT |
+| `fk_ranking_item_novel` | ranking_item.novel_id | novel.novel_id | RESTRICT |
+
+说明：小说与章节采用下架/软删除，全部使用 `ON DELETE RESTRICT`，禁止级联物理删除；`ON UPDATE` 统一 `CASCADE`。
+
+---
+
+## 5. 特殊约束与业务口径
+
+1. **评论可见性**：展示必须 `audit_status = 1 AND status = 1`；父评论异常时回复不单独展示（由 `v_comment_visible` 实现）。`status` 为软删除（3 已删除），不物理删除。
+2. **审核重审**：评论内容修改后 `audit_status` 重新置 0；评分短评新增/修改后 `review_audit_status` 重新置 0，`''` 统一存 `NULL`。由 BEFORE 触发器实现。
+3. **评分口径**：`novel_rating_stat` 为唯一权威统计，仅统计 `status = 1` 的评分，不按短评审核状态过滤；短评审核不影响数值评分。
+4. **计数口径**：`comment.like_count` 由点赞触发器维护；`reply_count` 仅统计 `status = 1 AND audit_status = 1` 的直接回复。
+5. **榜单口径**：同一榜单同一期次重复生成时先清空该期次再写入，保证幂等；只收录 `novel.status <> 2`（未下架）的作品；`period_no` 在同一榜单内必须保持统一格式（如 `202611`、`2026W47`、`20261127`），字典序即时间序。
+6. **收藏口径**：收藏/书架唯一数据源为 A 模块 `user_bookshelf`，C 模块只读取统计，不重复建收藏表。
+
+---
+
+## 6. 触发器说明（8 个）
+
+| 触发器 | 时机/事件 | 作用 |
+|---|---|---|
+| `trg_comment_like_ai` | AFTER INSERT ON comment_like | `comment.like_count + 1` |
+| `trg_comment_like_ad` | AFTER DELETE ON comment_like | `comment.like_count - 1`（下限 0，取消点赞为物理删除） |
+| `trg_comment_bu` | BEFORE UPDATE ON comment | 评论内容变更时 `audit_status` 置 0 |
+| `trg_novel_rating_bi` | BEFORE INSERT ON novel_rating | `''` 短评转 `NULL`；有短评时待审核 0 |
+| `trg_novel_rating_bu` | BEFORE UPDATE ON novel_rating | 短评规范化；内容变更后重新置 0 / 无短评置 NULL |
+| `trg_novel_rating_ai` | AFTER INSERT ON novel_rating | 新增有效评分，增量累加统计 |
+| `trg_novel_rating_au` | AFTER UPDATE ON novel_rating | 先扣旧贡献再累加新贡献（改分/隐藏） |
+| `trg_novel_rating_ad` | AFTER DELETE ON novel_rating | 删除有效评分，扣减统计 |
+
+**为什么 `reply_count` 不用触发器**：MySQL 禁止触发器更新触发该语句的同一张表（ERROR 1442），评论回复数无法由 `comment` 表自身触发器维护，因此改由存储过程 `sp_sync_comment_reply_count` 在业务同事务内重算。这是有意设计，不是遗漏。
+
+---
+
+## 7. 视图与存储过程
+
+### 视图
+
+| 视图 | 作用 |
+|---|---|
+| `v_comment_visible` | 评论展示视图：审核通过 + 状态正常 + 父评论正常 |
+| `v_novel_rating_summary` | 小说 + 评分统计联表，评分页/榜单直接取用 |
+| `v_ranking_item_detail` | 榜单条目 + 榜单元信息 + 书名 |
+| `v_ranking_latest` | 每榜最新期次明细 |
+
+### 存储过程
+
+| 过程 | 入参 / 出参 | 作用 |
+|---|---|---|
+| `sp_sync_comment_reply_count` | IN `p_comment_id` | 重算某条评论的直接回复数（插入/审核/删除后调用） |
+| `sp_refresh_rating_stat` | IN `p_novel_id` | 按明细重算评分统计，用于对账与历史回填 |
+| `sp_generate_ranking` | IN `p_ranking_id`, `p_period_no`；OUT `p_item_count` | 生成某榜单某期次名次快照 |
+| `sp_get_ranking` | IN `p_ranking_code`, `p_period_no`（空取最新）, `p_limit` | 查询榜单明细 |
+
+`sp_generate_ranking` 指标口径：
+
+| ranking_type | 数据源 | 指标值 |
+|---|---|---|
+| `FAVORITE` | `user_bookshelf` | 收藏人数（COUNT） |
+| `RATING` | `novel_rating_stat` | 平均分（0.00~5.00） |
+| `TICKET` | `reward_tip` | 成功打赏金额合计 |
+| `SALE` | `chapter_subscription` | 有效订阅实付金额合计 |
+| `READ` | 无 | 缺少阅读流水数据源，显式报错（见第 8 节） |
+
+`score = 指标值 × weight_config 中对应权重`（缺省 1.0），名次按 `score DESC, novel_id ASC` 排列，取 `top_n` 条。
+
+---
+
+## 8. 与数据字典的口径说明及待确认项
+
+1. **`ranking_type` / `period_type` 索引**：字段清单标记为“是”，但《索引清单》未列出这两个字段的索引定义；本实现以索引清单为准（仅建 `uk_ranking_code`）。若 D 需要按类型筛选榜单，建议评审后补 `idx_ranking_config_type(ranking_type, period_type, is_active)`。
+2. **READ 榜单**：全库没有阅读流水表（`user_bookshelf.last_read_at` 只有最近一次时间，无法累计阅读量），因此 `sp_generate_ranking` 对 `READ` 显式 `SIGNAL` 报错，不做近似统计。
+3. **期次口径**：`period_no` 目前只作为期次标签，指标为生成时刻的累计值；如需“自然月/自然周”窗口切片，需要评审确定 `period_no` 与时间区间的映射规则后再扩展。
+4. **榜单权重**：`weight_config` 只对当前 `ranking_type` 对应键取值；多指标加权榜单需要新增类型并在评审中明确口径。
+
+---
+
+## 9. 验证结论
+
+已在隔离的 MySQL 测试实例（26.7.0，库 `c_module_test`）按顺序执行全部脚本，退出码均为 0；6 张表、20 个显式索引、12 个外键、8 个触发器、4 个视图、4 个存储过程全部创建成功，触发器计数、评分统计、榜单生成与视图过滤等断言全部符合预期。详细输出见 `test/C_互动与榜单_执行结果_v1.0_20261121.md`。
