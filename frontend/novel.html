@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>作品详情 · 墨阅</title>
+  <meta name="description" content="查看作品简介、标签、字数与章节目录。">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="index.html" aria-label="墨阅首页"><span class="brand-mark">墨</span>墨阅</a>
+      <nav class="site-nav" aria-label="主导航">
+        <a href="index.html" aria-current="page">书城</a>
+        <a href="author.html">创作台</a>
+      </nav>
+      <div class="header-spacer"></div>
+      <form class="search" action="index.html" role="search">
+        <label class="visually-hidden" for="keyword">搜索作品</label>
+        <input id="keyword" type="search" name="keyword" placeholder="搜书名或作者" autocomplete="off" maxlength="50">
+        <button type="submit">搜索</button>
+      </form>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <nav class="breadcrumb" id="crumb" aria-label="面包屑">
+      <a href="index.html">书城</a><span class="sep">/</span><span>作品详情</span>
+    </nav>
+    <div id="detailArea" aria-live="polite" aria-busy="true"></div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <span>墨阅 · 网络文学创作与阅读平台</span>
+      <span>作品与内容模块</span>
+    </div>
+  </footer>
+
+  <script src="assets/js/mock.js" defer></script>
+  <script src="assets/js/api.js" defer></script>
+  <script src="assets/js/novel.js" defer></script>
+</body>
+</html>

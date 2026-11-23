@@ -29,3 +29,6 @@ config.local.*
 
 # 构建产物
 backend/target/
+
+# 前端本地调试产物
+frontend/.qa/

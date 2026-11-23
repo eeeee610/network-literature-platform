@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>书城 · 墨阅</title>
+  <meta name="description" content="墨阅书城：浏览连载与新书，按标签、状态与更新排序查找作品。">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="index.html" aria-label="墨阅首页"><span class="brand-mark">墨</span>墨阅</a>
+      <nav class="site-nav" aria-label="主导航">
+        <a href="index.html" aria-current="page">书城</a>
+        <a href="author.html">创作台</a>
+      </nav>
+      <div class="header-spacer"></div>
+      <form class="search" id="searchForm" role="search">
+        <label class="visually-hidden" for="keyword">搜索作品</label>
+        <input id="keyword" type="search" name="keyword" placeholder="搜书名或作者" autocomplete="off" maxlength="50">
+        <button type="submit">搜索</button>
+      </form>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="masthead">
+      <p class="eyebrow">书城</p>
+      <h1>在写的书，和写完的书</h1>
+      <p class="masthead-sub" id="resultInfo">正在整理书架…</p>
+    </section>
+
+    <section class="filters" aria-label="筛选与排序">
+      <div class="filter-field">
+        <span>标签</span>
+        <select id="tagSelect" aria-label="按标签筛选">
+          <option value="">全部标签</option>
+        </select>
+      </div>
+      <div class="filter-field">
+        <span>状态</span>
+        <div class="segmented" id="statusGroup" role="group" aria-label="按连载状态筛选">
+          <button type="button" data-status="" aria-pressed="true">全部</button>
+          <button type="button" data-status="0" aria-pressed="false">连载中</button>
+          <button type="button" data-status="1" aria-pressed="false">已完结</button>
+        </div>
+      </div>
+      <div class="filter-field">
+        <span>排序</span>
+        <select id="sortSelect" aria-label="排序方式">
+          <option value="update">最近更新</option>
+          <option value="words">总字数</option>
+          <option value="new">最新创建</option>
+        </select>
+      </div>
+      <button type="button" class="btn ghost small" id="resetBtn">重置筛选</button>
+    </section>
+
+    <div id="listArea" aria-live="polite" aria-busy="true"></div>
+    <nav class="pager" id="pager" aria-label="分页"></nav>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <span>墨阅 · 网络文学创作与阅读平台</span>
+      <span>作品与内容模块</span>
+    </div>
+  </footer>
+
+  <script src="assets/js/mock.js" defer></script>
+  <script src="assets/js/api.js" defer></script>
+  <script src="assets/js/index.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>创作台 · 墨阅</title>
+  <meta name="description" content="作者创作台：管理作品、创建章节草稿、发布与下架。">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="index.html" aria-label="墨阅首页"><span class="brand-mark">墨</span>墨阅</a>
+      <nav class="site-nav" aria-label="主导航">
+        <a href="index.html">书城</a>
+        <a href="author.html" aria-current="page">创作台</a>
+      </nav>
+      <div class="header-spacer"></div>
+      <form class="search" action="index.html" role="search">
+        <label class="visually-hidden" for="keyword">搜索作品</label>
+        <input id="keyword" type="search" name="keyword" placeholder="搜书名或作者" autocomplete="off" maxlength="50">
+        <button type="submit">搜索</button>
+      </form>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="page-head">
+      <h1>创作台</h1>
+      <p>管理你的作品与章节。审核状态由审核流程写入，作者只能查看。</p>
+    </section>
+
+    <section class="panel auth-bar" aria-labelledby="authTitle">
+      <div class="panel-head">
+        <h2 id="authTitle">作者身份</h2>
+        <span class="hint">本地联调：用开发令牌模拟作者登录</span>
+      </div>
+      <div class="auth-row">
+        <div class="user-field">
+          <label class="field-label" for="userId">用户 ID</label>
+          <input id="userId" type="text" inputmode="numeric" value="10001" autocomplete="off">
+        </div>
+        <button type="button" class="btn primary" id="devTokenBtn">获取开发令牌</button>
+        <div class="auth-status is-out" id="authStatus">未登录</div>
+        <div class="logout-wrap">
+          <button type="button" class="btn ghost" id="logoutBtn" disabled>退出</button>
+        </div>
+      </div>
+      <details class="token-manual">
+        <summary>手动粘贴令牌</summary>
+        <div class="token-row">
+          <textarea id="tokenInput" rows="2" placeholder="粘贴服务端签发的 JWT" aria-label="手动粘贴令牌"></textarea>
+          <button type="button" class="btn" id="saveTokenBtn">保存令牌</button>
+        </div>
+      </details>
+    </section>
+
+    <section class="guide" id="loggedOut">
+      <h2>请先获取令牌</h2>
+      <p>创作台的作品与章节接口需要作者身份。填写用户 ID 后点「获取开发令牌」，或手动粘贴一个 AUTHOR 角色的 JWT。未登录时不会发起任何鉴权请求。</p>
+    </section>
+
+    <div id="workspace" hidden>
+      <section class="panel">
+        <div class="panel-head">
+          <h2>我的作品</h2>
+          <button type="button" class="btn small ghost" id="reloadWorksBtn">刷新</button>
+        </div>
+        <div id="workList" aria-live="polite"></div>
+
+        <div class="sub-block">
+          <h3>新建作品</h3>
+          <form id="novelForm" class="form-grid" novalidate>
+            <div>
+              <label class="field-label" for="novelTitle">书名 <span class="req">*</span></label>
+              <input id="novelTitle" type="text" maxlength="120" placeholder="最多 120 字" autocomplete="off">
+            </div>
+            <div>
+              <label class="field-label" for="coverUrl">封面 URL</label>
+              <input id="coverUrl" type="text" maxlength="255" placeholder="可留空，封面用书名首字占位" autocomplete="off">
+            </div>
+            <div class="span-2">
+              <label class="field-label" for="novelDesc">简介</label>
+              <textarea id="novelDesc" rows="3" maxlength="1000" placeholder="最多 1000 字"></textarea>
+            </div>
+            <div class="span-2">
+              <span class="field-label">标签（最多 10 个）</span>
+              <div class="tag-picker" id="novelTags"><span class="field-hint">标签加载中…</span></div>
+            </div>
+            <div class="span-2 form-actions">
+              <button type="submit" class="btn primary" id="createNovelBtn">创建作品</button>
+              <span class="counter" id="tagCounter">已选 0 / 10</span>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="chaptersTitle">
+        <div class="panel-head">
+          <h2 id="chaptersTitle">章节管理</h2>
+          <span class="hint" id="selectedNovelHint">先在「我的作品」里选择一部作品</span>
+        </div>
+
+        <div class="state-box" id="chapterEmpty">
+          <div class="state-icon">章</div>
+          <strong>还没有选择作品</strong>
+          <p>点作品行右侧的「管理章节」，就可以创建草稿、改稿、发布或下架。</p>
+        </div>
+
+        <div class="chapter-layout" id="chapterLayout" hidden>
+          <div class="chapter-col">
+            <div class="chapter-list" id="chapterList"></div>
+            <p class="offline-note" id="chapterNote" hidden></p>
+          </div>
+
+          <form class="form-grid chapter-form" id="chapterForm" novalidate>
+            <h3 class="form-title span-2" id="chapterFormTitle">新建章节草稿</h3>
+            <div class="span-2">
+              <label class="field-label" for="chapterTitle">章节标题 <span class="req">*</span></label>
+              <input id="chapterTitle" type="text" maxlength="120" placeholder="如：第一章 雨夜" autocomplete="off">
+            </div>
+            <div class="span-2">
+              <label class="field-label" for="chapterContent">正文 <span class="req">*</span></label>
+              <textarea id="chapterContent" rows="12" placeholder="正文按字符数统计字数"></textarea>
+              <p class="field-hint">保存后可再改稿；已发布章节改稿会自动下线并重新进入审核。</p>
+            </div>
+            <div>
+              <label class="field-label" for="chapterVip">是否 VIP</label>
+              <select id="chapterVip">
+                <option value="0">免费章节</option>
+                <option value="1">VIP 章节</option>
+              </select>
+            </div>
+            <div>
+              <label class="field-label" for="chapterPrice">VIP 价格（元）</label>
+              <input id="chapterPrice" type="number" min="0" step="0.01" value="0.00" disabled>
+            </div>
+            <div class="span-2 form-actions">
+              <button type="submit" class="btn primary" id="saveChapterBtn">保存草稿</button>
+              <button type="button" class="btn ghost" id="cancelEditBtn" hidden>取消改稿</button>
+              <span class="counter" id="chapterFormHint"></span>
+            </div>
+          </form>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <span>墨阅 · 网络文学创作与阅读平台</span>
+      <span>作品与内容模块</span>
+    </div>
+  </footer>
+
+  <script src="assets/js/mock.js" defer></script>
+  <script src="assets/js/api.js" defer></script>
+  <script src="assets/js/author.js" defer></script>
+</body>
+</html>

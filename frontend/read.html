@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>阅读 · 墨阅</title>
+  <meta name="description" content="章节阅读：正文、目录与上一章 / 下一章。">
+  <script>
+    try {
+      if (localStorage.getItem('np_reader_theme') === 'dark') {
+        document.documentElement.dataset.theme = 'dark';
+      }
+    } catch (e) {}
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="reader-page">
+  <header class="site-header reader-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="index.html" aria-label="墨阅首页"><span class="brand-mark">墨</span>墨阅</a>
+      <a class="reader-book" id="bookLink" href="index.html">作品详情</a>
+      <div class="header-spacer"></div>
+      <div class="reader-header-actions">
+        <button type="button" class="btn small ghost toc-toggle" id="tocToggle" aria-expanded="false" aria-controls="toc">目录</button>
+        <button type="button" class="btn small ghost" id="themeToggle" aria-pressed="false">深色</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="reader-shell">
+      <div class="drawer-backdrop" id="drawerBackdrop"></div>
+
+      <aside class="toc" id="toc" aria-label="章节目录">
+        <div class="toc-head">
+          <h2>目录</h2>
+          <span class="toc-count" id="tocCount"></span>
+          <button type="button" class="toc-close" id="tocClose" aria-label="关闭目录">×</button>
+        </div>
+        <div class="toc-list" id="tocList">
+          <p class="toc-fail">目录加载中…</p>
+        </div>
+      </aside>
+
+      <article class="reader-main" id="readerMain" aria-live="polite" aria-busy="true"></article>
+    </div>
+  </main>
+
+  <script src="assets/js/mock.js" defer></script>
+  <script src="assets/js/api.js" defer></script>
+  <script src="assets/js/read.js" defer></script>
+</body>
+</html>
