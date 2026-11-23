@@ -21,3 +21,7 @@ Desktop.ini
 # 环境配置/密码（如果后续有）
 .env
 config.local.*
+
+# 本地 Python 依赖与临时验证目录（不提交）
+.pylibs/
+.tmp/
