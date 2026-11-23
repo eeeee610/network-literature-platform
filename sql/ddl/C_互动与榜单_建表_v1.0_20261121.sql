@@ -4,7 +4,7 @@
 -- 模块：C（互动与榜单）        负责人：C        版本：v1.0 / 2026-11-21
 -- 依据：docs/current/D_数据字典_v1.0_20261120.xlsx（冻结基线）
 --       docs/current/er/全局_ER图_v1.0_20261120.drawio
--- 数据库：MySQL 8.0+   引擎：InnoDB   字符集：utf8mb4
+-- 数据库：MySQL 8.0.16+   引擎：InnoDB   字符集：utf8mb4
 -- -------------------------------------------------------------------
 -- 前置依赖（由 A / B 模块提供，本脚本不创建）：
 --   app_user (user_id)        ← A 用户与交易
@@ -118,16 +118,16 @@ CREATE TABLE IF NOT EXISTS ranking_config (
   ranking_id    BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '榜单ID；自增主键',
   ranking_code  VARCHAR(50)     NOT NULL                COMMENT '榜单编码；唯一，如 FAVORITE_MONTH、RATING_ALL',
   ranking_name  VARCHAR(100)    NOT NULL                COMMENT '榜单名称；展示名称，如“月收藏榜”',
-  ranking_type  VARCHAR(30)     NOT NULL                COMMENT '榜单指标类型；READ/FAVORITE/RATING/TICKET/SALE',
+  ranking_type  VARCHAR(30)     NOT NULL                COMMENT '榜单指标类型；FAVORITE/RATING/TICKET/SALE',
   period_type   VARCHAR(20)     NOT NULL                COMMENT '统计周期；DAILY/WEEKLY/MONTHLY/ALL',
   top_n         INT             NOT NULL DEFAULT 100    COMMENT '展示条数上限；榜单最多展示 N 条',
-  weight_config JSON            NULL DEFAULT NULL       COMMENT '权重配置；如 {"read":0.4,"favorite":0.3,"rating":0.3}；rating 采用 0.00~5.00',
+  weight_config JSON            NULL DEFAULT NULL       COMMENT '权重配置；如 {"favorite":0.4,"rating":0.6}；rating 采用 0.00~5.00',
   is_active     TINYINT         NOT NULL DEFAULT 1      COMMENT '是否启用；1 启用 0 停用；停用后不再生成新期次',
   created_at    DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP                 COMMENT '创建时间',
   updated_at    DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (ranking_id),
   UNIQUE KEY uk_ranking_config_code (ranking_code),
-  CONSTRAINT ck_ranking_config_type   CHECK (ranking_type IN ('READ','FAVORITE','RATING','TICKET','SALE')),
+  CONSTRAINT ck_ranking_config_type   CHECK (ranking_type IN ('FAVORITE','RATING','TICKET','SALE')),
   CONSTRAINT ck_ranking_config_period CHECK (period_type IN ('DAILY','WEEKLY','MONTHLY','ALL')),
   CONSTRAINT ck_ranking_config_topn   CHECK (top_n > 0),
   CONSTRAINT ck_ranking_config_active CHECK (is_active IN (0, 1))

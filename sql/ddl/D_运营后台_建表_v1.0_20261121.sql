@@ -1,5 +1,5 @@
 -- 网络文学创作与阅读平台 D 模块（运营后台）建表脚本
--- 适用版本：MySQL 8.0
+-- 适用版本：MySQL 8.0.16+
 -- 设计依据：D_数据字典_v1.0_20261120.xlsx、全局_ER图_v1.0_20261120.drawio
 -- 前置依赖：A 模块 app_user 表已创建，user_id 类型为 BIGINT UNSIGNED
 -- 存储引擎：InnoDB；字符集：utf8mb4

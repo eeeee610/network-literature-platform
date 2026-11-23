@@ -263,7 +263,7 @@ CREATE TABLE IF NOT EXISTS `account_transaction` (
     UNIQUE KEY `uk_account_transaction_biz_key` (`biz_key`),
     KEY `idx_txn_user_time` (`user_id`, `created_at`),
     KEY `idx_txn_request_no` (`request_no`),
-    KEY `idx_txn_type_ref` (`biz_type`, `related_id`),
+    KEY `idx_txn_type_ref` (`related_type`, `related_id`),
     CONSTRAINT `fk_txn_user`
         FOREIGN KEY (`user_id`) REFERENCES `app_user` (`user_id`)
         ON DELETE RESTRICT ON UPDATE CASCADE,
