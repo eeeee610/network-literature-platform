@@ -135,10 +135,10 @@ INSERT INTO ranking_config
   (1, 'FAVORITE_MONTH', '月收藏榜', 'FAVORITE', 'MONTHLY', 3, '{"favorite":1.0}'),
   (2, 'RATING_ALL',     '总评分榜', 'RATING',   'ALL',     3, '{"rating":1.0}');
 
-CALL sp_generate_ranking(1, '202611', @cnt_fav);
+CALL sp_generate_ranking(1, '202611', 0, @cnt_fav);
 SELECT '收藏榜生成条数（下架作品排除），期望 2' AS note, @cnt_fav AS item_count;
 
-CALL sp_generate_ranking(2, '202611', @cnt_rate);
+CALL sp_generate_ranking(2, '202611', 0, @cnt_rate);
 SELECT '评分榜生成条数，期望 2' AS note, @cnt_rate AS item_count;
 
 SELECT '收藏榜最新期次' AS note, ranking_code, period_no, rank_no, novel_title, score, metric_snapshot
