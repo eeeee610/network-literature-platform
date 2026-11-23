@@ -113,6 +113,7 @@ BEGIN
   DECLARE v_words      INT UNSIGNED;
   DECLARE v_chapter_no INT UNSIGNED;
   DECLARE v_cnt        INT DEFAULT 0;
+  DECLARE v_lock       BIGINT UNSIGNED;
   DECLARE EXIT HANDLER FOR 1062
   BEGIN
     ROLLBACK;
@@ -161,7 +162,7 @@ BEGIN
     IF v_novel_id IS NULL THEN
       SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '章节不存在';
     END IF;
-    SELECT COUNT(*) INTO v_cnt FROM novel WHERE novel_id = v_novel_id FOR UPDATE;
+    SELECT novel_id INTO v_lock FROM novel WHERE novel_id = v_novel_id FOR UPDATE;
     SELECT status, audit_status, word_count
       INTO v_old_status, v_old_audit, v_old_words
     FROM chapter WHERE chapter_id = p_chapter_id FOR UPDATE;
@@ -211,7 +212,7 @@ BEGIN
   DECLARE v_status   TINYINT;
   DECLARE v_audit    TINYINT;
   DECLARE v_words    INT UNSIGNED;
-  DECLARE v_lock     INT DEFAULT 0;
+  DECLARE v_lock     BIGINT UNSIGNED;
   DECLARE EXIT HANDLER FOR SQLEXCEPTION
   BEGIN
     ROLLBACK;
@@ -226,7 +227,7 @@ BEGIN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '章节不存在';
   END IF;
 
-  SELECT COUNT(*) INTO v_lock FROM novel WHERE novel_id = v_novel_id FOR UPDATE;
+  SELECT novel_id INTO v_lock FROM novel WHERE novel_id = v_novel_id FOR UPDATE;
   SELECT status, audit_status, word_count INTO v_status, v_audit, v_words
   FROM chapter WHERE chapter_id = p_chapter_id FOR UPDATE;
 
@@ -264,7 +265,7 @@ BEGIN
   DECLARE v_novel_id BIGINT UNSIGNED;
   DECLARE v_status   TINYINT;
   DECLARE v_words    INT UNSIGNED;
-  DECLARE v_lock     INT DEFAULT 0;
+  DECLARE v_lock     BIGINT UNSIGNED;
   DECLARE EXIT HANDLER FOR SQLEXCEPTION
   BEGIN
     ROLLBACK;
@@ -279,7 +280,7 @@ BEGIN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '章节不存在';
   END IF;
 
-  SELECT COUNT(*) INTO v_lock FROM novel WHERE novel_id = v_novel_id FOR UPDATE;
+  SELECT novel_id INTO v_lock FROM novel WHERE novel_id = v_novel_id FOR UPDATE;
   SELECT status, word_count INTO v_status, v_words
   FROM chapter WHERE chapter_id = p_chapter_id FOR UPDATE;
 
