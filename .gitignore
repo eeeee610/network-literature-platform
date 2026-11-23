@@ -25,3 +25,7 @@ config.local.*
 # 本地 Python 依赖与临时验证目录（不提交）
 .pylibs/
 .tmp/
+.tools/
+
+# 构建产物
+backend/target/
