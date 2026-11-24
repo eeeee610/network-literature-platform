@@ -146,38 +146,56 @@ END$$
 DELIMITER ;
 
 -- 3. 生成榜单期次快照
---    入参：p_ranking_id 榜单ID；p_period_no 期次号（如 202611）；p_item_count 出参，写入条数
+--    入参：p_ranking_id 榜单ID；p_period_no 期次号（如 202611）；
+--          p_allow_history_overwrite 历史覆盖修复标记，常规生成必须为 0；
+--          p_item_count 出参，写入条数。
 --    口径：指标为生成时刻的累计值；score = 指标值 × weight_config 中对应权重（缺省 1.0）。
 --          FAVORITE 取 user_bookshelf 收藏数；RATING 取 novel_rating_stat.avg_score；
 --          TICKET 取 reward_tip 成功打赏金额；SALE 取 chapter_subscription 有效订阅实付金额。
 --          READ 缺少阅读流水数据源，显式报错（见 SQL 说明）。
 --          仅收录 novel.status <> 2（未下架）的作品。
---    注意：同一榜单同一期次重复生成时会先清空该期次旧快照，保证幂等。
+--    事务：同一期次的 DELETE + INSERT 必须同时成功或同时失败。
+--    历史：已有历史期次默认禁止覆盖；仅显式传入修复标记 1 时允许历史修复。
 DROP PROCEDURE IF EXISTS sp_generate_ranking;
 DELIMITER $$
 CREATE PROCEDURE sp_generate_ranking(
-  IN  p_ranking_id  BIGINT UNSIGNED,
-  IN  p_period_no   VARCHAR(20),
-  OUT p_item_count  INT
+  IN  p_ranking_id               BIGINT UNSIGNED,
+  IN  p_period_no                VARCHAR(20),
+  IN  p_allow_history_overwrite  TINYINT,
+  OUT p_item_count               INT
 )
 BEGIN
-  DECLARE v_type    VARCHAR(30) DEFAULT NULL;
-  DECLARE v_active  TINYINT DEFAULT NULL;
-  DECLARE v_top_n   INT DEFAULT 100;
-  DECLARE v_weight  DECIMAL(10,4) DEFAULT 1.0000;
+  DECLARE v_type            VARCHAR(30) DEFAULT NULL;
+  DECLARE v_period_type     VARCHAR(10) DEFAULT NULL;
+  DECLARE v_active          TINYINT DEFAULT NULL;
+  DECLARE v_top_n           INT DEFAULT 100;
+  DECLARE v_weight          DECIMAL(10,4) DEFAULT 1.0000;
+  DECLARE v_current_period  VARCHAR(20) DEFAULT NULL;
+  DECLARE v_snapshot_exists INT DEFAULT 0;
+
+  DECLARE EXIT HANDLER FOR SQLEXCEPTION
+  BEGIN
+    ROLLBACK;
+    DROP TEMPORARY TABLE IF EXISTS tmp_ranking_metric;
+    RESIGNAL;
+  END;
 
   SET p_item_count = 0;
 
   IF p_period_no IS NULL OR TRIM(p_period_no) = '' THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '期次号 period_no 不能为空';
   END IF;
+  IF p_allow_history_overwrite IS NULL OR p_allow_history_overwrite NOT IN (0, 1) THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '历史覆盖修复标记必须为 0 或 1';
+  END IF;
 
   SELECT ranking_type,
+         period_type,
          is_active,
          top_n,
          COALESCE(CAST(JSON_EXTRACT(weight_config,
                   CONCAT('$.', LOWER(ranking_type))) AS DECIMAL(10,4)), 1.0000)
-    INTO v_type, v_active, v_top_n, v_weight
+    INTO v_type, v_period_type, v_active, v_top_n, v_weight
     FROM ranking_config
    WHERE ranking_id = p_ranking_id;
 
@@ -186,6 +204,28 @@ BEGIN
   END IF;
   IF v_active <> 1 THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = '榜单已停用，不能生成新期次';
+  END IF;
+
+  SET v_current_period = CASE v_period_type
+    WHEN 'DAY' THEN DATE_FORMAT(NOW(), '%Y%m%d')
+    WHEN 'WEEK' THEN DATE_FORMAT(NOW(), '%x-W%v')
+    WHEN 'MONTH' THEN DATE_FORMAT(NOW(), '%Y%m')
+    ELSE 'CURRENT'
+  END;
+
+  SELECT EXISTS (
+    SELECT 1
+      FROM ranking_item
+     WHERE ranking_id = p_ranking_id
+       AND period_no = p_period_no
+  ) INTO v_snapshot_exists;
+
+  IF v_snapshot_exists = 1
+     AND v_period_type <> 'CURRENT'
+     AND p_period_no < v_current_period
+     AND p_allow_history_overwrite = 0 THEN
+    SIGNAL SQLSTATE '45000'
+      SET MESSAGE_TEXT = '历史期次默认禁止覆盖，历史修复须显式传入覆盖标记 1';
   END IF;
 
   DROP TEMPORARY TABLE IF EXISTS tmp_ranking_metric;
@@ -222,6 +262,9 @@ BEGIN
       SET MESSAGE_TEXT = 'READ 榜单缺少阅读流水数据源，暂不支持自动生成';
   END IF;
 
+  -- 删除旧数据与插入新数据在同一事务中，任一失败即整体回滚。
+  START TRANSACTION;
+
   DELETE FROM ranking_item
    WHERE ranking_id = p_ranking_id AND period_no = p_period_no;
 
@@ -244,9 +287,16 @@ BEGIN
 
   SET p_item_count = ROW_COUNT();
 
+  COMMIT;
+
   DROP TEMPORARY TABLE IF EXISTS tmp_ranking_metric;
 END$$
 DELIMITER ;
+
+-- 常规生成或当前期次重建：
+-- CALL sp_generate_ranking(1, '202611', 0, @cnt);
+-- 明确执行历史修复时才允许覆盖已有历史期次：
+-- CALL sp_generate_ranking(1, '202601', 1, @cnt);
 
 -- 4. 查询榜单
 --    入参：p_ranking_code 榜单编码；p_period_no 期次（NULL/空 取最新）；p_limit 返回条数

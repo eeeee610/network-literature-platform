@@ -65,7 +65,6 @@ CREATE TABLE IF NOT EXISTS `app_user` (
     UNIQUE KEY `uk_app_user_username` (`username`),
     UNIQUE KEY `uk_app_user_email` (`email`),
     UNIQUE KEY `uk_app_user_phone` (`phone`),
-    KEY `idx_user_role_status` (`role`, `status`),
     CONSTRAINT `ck_user_username_not_blank` CHECK (CHAR_LENGTH(TRIM(`username`)) > 0),
     CONSTRAINT `ck_user_password_hash_len` CHECK (CHAR_LENGTH(`password_hash`) >= 20)
 ) ENGINE = InnoDB
@@ -263,7 +262,6 @@ CREATE TABLE IF NOT EXISTS `account_transaction` (
     UNIQUE KEY `uk_account_transaction_txn_no` (`txn_no`),
     UNIQUE KEY `uk_account_transaction_biz_key` (`biz_key`),
     KEY `idx_txn_user_time` (`user_id`, `created_at`),
-    KEY `idx_txn_user_id` (`user_id`, `txn_id`),
     KEY `idx_txn_request_no` (`request_no`),
     KEY `idx_txn_type_ref` (`biz_type`, `related_id`),
     CONSTRAINT `fk_txn_user`
