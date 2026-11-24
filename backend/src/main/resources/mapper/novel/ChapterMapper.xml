@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.novel.platform.modules.novel.mapper.ChapterMapper">
+
+    <select id="selectPublicCatalog" resultType="com.novel.platform.modules.novel.dto.ChapterRow">
+        SELECT chapter_id,
+               novel_id,
+               chapter_no,
+               title,
+               is_vip,
+               vip_price,
+               word_count,
+               publish_time
+        FROM chapter
+        WHERE novel_id = #{novelId}
+          AND status = 1
+          AND audit_status = 1
+          AND publish_time IS NOT NULL
+        ORDER BY chapter_no ASC
+    </select>
+
+    <select id="selectChapterForRead" resultType="com.novel.platform.modules.novel.dto.ChapterRow">
+        SELECT c.chapter_id,
+               c.novel_id,
+               n.title AS novel_title,
+               c.chapter_no,
+               c.title,
+               c.content,
+               c.is_vip,
+               c.vip_price,
+               c.word_count,
+               c.publish_time
+        FROM chapter c
+        JOIN novel n ON n.novel_id = c.novel_id
+        WHERE c.chapter_id = #{chapterId}
+          AND c.status = 1
+          AND c.audit_status = 1
+          AND c.publish_time IS NOT NULL
+          AND n.audit_status = 1
+          AND n.status IN (0, 1)
+    </select>
+
+    <select id="selectPrevChapter" resultType="com.novel.platform.modules.novel.dto.ChapterRow">
+        SELECT chapter_id, chapter_no, title
+        FROM chapter
+        WHERE novel_id = #{novelId}
+          AND status = 1
+          AND audit_status = 1
+          AND publish_time IS NOT NULL
+          AND chapter_no &lt; #{chapterNo}
+        ORDER BY chapter_no DESC
+        LIMIT 1
+    </select>
+
+    <select id="selectNextChapter" resultType="com.novel.platform.modules.novel.dto.ChapterRow">
+        SELECT chapter_id, chapter_no, title
+        FROM chapter
+        WHERE novel_id = #{novelId}
+          AND status = 1
+          AND audit_status = 1
+          AND publish_time IS NOT NULL
+          AND chapter_no &gt; #{chapterNo}
+        ORDER BY chapter_no ASC
+        LIMIT 1
+    </select>
+
+    <select id="selectAuthorChapters" resultType="com.novel.platform.modules.novel.dto.ChapterRow">
+        SELECT chapter_id,
+               novel_id,
+               chapter_no,
+               title,
+               is_vip,
+               vip_price,
+               word_count,
+               status,
+               audit_status,
+               publish_time,
+               created_at,
+               updated_at
+        FROM chapter
+        WHERE novel_id = #{novelId}
+        ORDER BY chapter_no ASC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <select id="countAuthorChapters" resultType="long">
+        SELECT COUNT(*)
+        FROM chapter
+        WHERE novel_id = #{novelId}
+    </select>
+
+    <select id="selectChapterById" resultType="com.novel.platform.modules.novel.dto.ChapterRow">
+        SELECT chapter_id,
+               novel_id,
+               chapter_no,
+               title,
+               is_vip,
+               vip_price,
+               word_count,
+               status,
+               audit_status,
+               publish_time,
+               created_at,
+               updated_at
+        FROM chapter
+        WHERE chapter_id = #{chapterId}
+    </select>
+
+    <select id="selectAuthorChapterDetail" resultType="com.novel.platform.modules.novel.dto.ChapterRow">
+        SELECT chapter_id,
+               novel_id,
+               chapter_no,
+               title,
+               content,
+               is_vip,
+               vip_price,
+               word_count,
+               status,
+               audit_status,
+               publish_time,
+               updated_at
+        FROM chapter
+        WHERE chapter_id = #{chapterId}
+    </select>
+
+</mapper>

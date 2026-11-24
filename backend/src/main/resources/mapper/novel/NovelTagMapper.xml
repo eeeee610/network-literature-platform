@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.novel.platform.modules.novel.mapper.NovelTagMapper">
+
+    <select id="selectByNovelIds" resultType="com.novel.platform.modules.novel.dto.TagRow">
+        SELECT nt.novel_id,
+               t.tag_id,
+               t.tag_name,
+               nt.sort_order
+        FROM novel_tag nt
+        JOIN tag t ON t.tag_id = nt.tag_id
+        WHERE nt.novel_id IN
+        <foreach collection="novelIds" item="novelId" open="(" separator="," close=")">
+            #{novelId}
+        </foreach>
+        ORDER BY nt.novel_id ASC, nt.sort_order ASC, t.tag_id ASC
+    </select>
+
+    <select id="selectDetailByNovelId" resultType="com.novel.platform.modules.novel.dto.TagRow">
+        SELECT nt.novel_id,
+               t.tag_id,
+               t.tag_name,
+               nt.sort_order
+        FROM novel_tag nt
+        JOIN tag t ON t.tag_id = nt.tag_id
+        WHERE nt.novel_id = #{novelId}
+        ORDER BY nt.sort_order ASC, t.tag_id ASC
+    </select>
+
+    <delete id="deleteByNovelId">
+        DELETE FROM novel_tag WHERE novel_id = #{novelId}
+    </delete>
+
+    <insert id="insertBatch">
+        INSERT INTO novel_tag (novel_id, tag_id, sort_order)
+        VALUES
+        <foreach collection="items" item="item" separator=",">
+            (#{item.novelId}, #{item.tagId}, #{item.sortOrder})
+        </foreach>
+    </insert>
+
+</mapper>

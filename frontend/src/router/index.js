@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import AdminLayout from '@/layouts/AdminLayout.vue'
+import SiteLayout from '@/layouts/SiteLayout.vue'
 
 const routes = [
   {
@@ -40,6 +41,54 @@ const routes = [
         name: 'AdminRankings',
         component: () => import('@/views/admin/RankingConfigView.vue'),
         meta: { title: '榜单配置' },
+      },
+    ],
+  },
+  {
+    path: '/bookstore',
+    component: SiteLayout,
+    children: [
+      {
+        path: '',
+        name: 'Bookstore',
+        component: () => import('@/views/novel/BookstoreView.vue'),
+        meta: { title: '书城' },
+      },
+    ],
+  },
+  {
+    path: '/novel/:novelId',
+    component: SiteLayout,
+    children: [
+      {
+        path: '',
+        name: 'NovelDetail',
+        component: () => import('@/views/novel/NovelDetailView.vue'),
+        meta: { title: '作品详情' },
+      },
+    ],
+  },
+  {
+    path: '/read/:chapterId',
+    component: SiteLayout,
+    children: [
+      {
+        path: '',
+        name: 'Reader',
+        component: () => import('@/views/novel/ReaderView.vue'),
+        meta: { title: '阅读' },
+      },
+    ],
+  },
+  {
+    path: '/author',
+    component: SiteLayout,
+    children: [
+      {
+        path: '',
+        name: 'AuthorWorkbench',
+        component: () => import('@/views/novel/AuthorWorkbenchView.vue'),
+        meta: { title: '创作台' },
       },
     ],
   },
