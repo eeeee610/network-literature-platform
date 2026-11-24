@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.novel.platform.modules.interaction.mapper.CommentMapper">
+
+    <select id="selectTopComments" resultType="com.novel.platform.modules.interaction.dto.CommentRow">
+        SELECT c.comment_id,
+               c.novel_id,
+               c.chapter_id,
+               c.parent_id,
+               c.reply_to_user_id,
+               c.user_id,
+               c.content,
+               c.like_count,
+               c.reply_count,
+               c.is_top,
+               c.created_at,
+               u.nickname,
+               u.avatar_url,
+               <choose>
+                   <when test="viewerUserId != null">
+                       (SELECT COUNT(*) FROM comment_like l
+                         WHERE l.comment_id = c.comment_id AND l.user_id = #{viewerUserId}) AS liked
+                   </when>
+                   <otherwise>0 AS liked</otherwise>
+               </choose>
+        FROM v_comment_visible c
+        JOIN app_user u ON u.user_id = c.user_id
+        WHERE c.novel_id = #{novelId}
+          AND c.parent_id IS NULL
+        <choose>
+            <when test="chapterId != null">AND c.chapter_id = #{chapterId}</when>
+            <otherwise>AND c.chapter_id IS NULL</otherwise>
+        </choose>
+        ORDER BY c.is_top DESC, c.created_at DESC, c.comment_id DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countTopComments" resultType="long">
+        SELECT COUNT(*)
+        FROM v_comment_visible c
+        WHERE c.novel_id = #{novelId}
+          AND c.parent_id IS NULL
+        <choose>
+            <when test="chapterId != null">AND c.chapter_id = #{chapterId}</when>
+            <otherwise>AND c.chapter_id IS NULL</otherwise>
+        </choose>
+    </select>
+
+    <select id="selectReplies" resultType="com.novel.platform.modules.interaction.dto.CommentRow">
+        SELECT c.comment_id,
+               c.novel_id,
+               c.chapter_id,
+               c.parent_id,
+               c.reply_to_user_id,
+               c.user_id,
+               c.content,
+               c.like_count,
+               c.reply_count,
+               c.is_top,
+               c.created_at,
+               u.nickname,
+               u.avatar_url,
+               ru.nickname AS reply_to_nickname,
+               <choose>
+                   <when test="viewerUserId != null">
+                       (SELECT COUNT(*) FROM comment_like l
+                         WHERE l.comment_id = c.comment_id AND l.user_id = #{viewerUserId}) AS liked
+                   </when>
+                   <otherwise>0 AS liked</otherwise>
+               </choose>
+        FROM v_comment_visible c
+        JOIN app_user u ON u.user_id = c.user_id
+        LEFT JOIN app_user ru ON ru.user_id = c.reply_to_user_id
+        WHERE c.parent_id IN
+        <foreach collection="parentIds" item="pid" open="(" separator="," close=")">
+            #{pid}
+        </foreach>
+        ORDER BY c.created_at ASC, c.comment_id ASC
+    </select>
+
+    <select id="selectAdminComments" resultType="com.novel.platform.modules.interaction.dto.CommentRow">
+        SELECT c.comment_id,
+               c.novel_id,
+               c.chapter_id,
+               c.parent_id,
+               c.user_id,
+               c.content,
+               c.like_count,
+               c.reply_count,
+               c.status,
+               c.audit_status,
+               c.created_at,
+               u.nickname,
+               n.title AS novel_title
+        FROM comment c
+        JOIN app_user u ON u.user_id = c.user_id
+        JOIN novel n ON n.novel_id = c.novel_id
+        <where>
+            <if test="novelId != null">AND c.novel_id = #{novelId}</if>
+            <if test="status != null">AND c.status = #{status}</if>
+            <if test="auditStatus != null">AND c.audit_status = #{auditStatus}</if>
+            <if test="keyword != null and keyword != ''">
+                AND c.content LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+        </where>
+        ORDER BY c.created_at DESC, c.comment_id DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countAdminComments" resultType="long">
+        SELECT COUNT(*)
+        FROM comment c
+        <where>
+            <if test="novelId != null">AND c.novel_id = #{novelId}</if>
+            <if test="status != null">AND c.status = #{status}</if>
+            <if test="auditStatus != null">AND c.audit_status = #{auditStatus}</if>
+            <if test="keyword != null and keyword != ''">
+                AND c.content LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+        </where>
+    </select>
+</mapper>
