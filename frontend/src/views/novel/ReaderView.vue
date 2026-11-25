@@ -1,11 +1,13 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
+import { ElMessage } from 'element-plus'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import {
   getChapter,
   getErrorMessage,
   getNovelChapters,
 } from '@/api/novel'
+import { subscribeChapter } from '@/api/user'
 import { isLoggedIn } from '@/api/auth'
 
 const route = useRoute()
@@ -21,6 +23,7 @@ const chaptersNovelId = ref('')
 const chaptersLoading = ref(false)
 const chaptersError = ref('')
 const drawerVisible = ref(false)
+const subscribeLoading = ref(false)
 
 const chapterId = computed(() => String(route.params.chapterId || ''))
 const paragraphs = computed(() => {
@@ -101,6 +104,26 @@ function goTo(id) {
   if (!id) return
   drawerVisible.value = false
   router.push(`/read/${id}`)
+}
+
+async function handleSubscribe() {
+  if (subscribeLoading.value) return
+  if (!chapterId.value) {
+    ElMessage.warning('章节信息异常，请刷新后重试')
+    return
+  }
+  subscribeLoading.value = true
+  try {
+    const requestNo = `SUB-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+    await subscribeChapter({ chapterId: chapterId.value, requestNo })
+    ElMessage.success('订阅成功！正在加载正文…')
+    await loadChapter()
+  } catch (err) {
+    const msg = getErrorMessage(err, '订阅失败，请稍后重试')
+    ElMessage.error(msg)
+  } finally {
+    subscribeLoading.value = false
+  }
 }
 
 watch(
@@ -189,11 +212,25 @@ watch(
         <div class="vip-locked">
           <el-empty description="本章为 VIP 章节，订阅后可阅读全文" />
           <p class="state-note">
-            本章定价 ¥{{ formatPrice(chapter.vipPrice) }}，订阅与扣费由 A 模块负责。登录并完成订阅后即可阅读正文。
+            本章定价 <strong>¥{{ formatPrice(chapter.vipPrice) }}</strong>，
+            点击下方按钮直接订阅，余额将自动扣费。
           </p>
           <div class="state-actions">
-            <el-button v-if="!loggedIn" type="primary" @click="goLogin">登录后订阅</el-button>
-            <el-button v-else type="primary" @click="router.push('/account')">去书院订阅</el-button>
+            <el-button
+              v-if="!loggedIn"
+              type="primary"
+              @click="goLogin"
+            >
+              登录后订阅
+            </el-button>
+            <el-button
+              v-else
+              type="primary"
+              :loading="subscribeLoading"
+              @click="handleSubscribe"
+            >
+              立即订阅 ¥{{ formatPrice(chapter.vipPrice) }}
+            </el-button>
             <el-button @click="router.push(detailLink)">返回作品详情</el-button>
           </div>
         </div>

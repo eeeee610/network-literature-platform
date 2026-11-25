@@ -1,13 +1,24 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
-import { RouterLink, useRoute } from 'vue-router'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import { Check, Money, Star } from '@element-plus/icons-vue'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
 import {
   getErrorMessage,
   getNovelChapters,
   getNovelDetail,
 } from '@/api/novel'
+import {
+  addToBookshelf,
+  removeFromBookshelf,
+  getBookshelf,
+  tipNovel,
+  getAccount,
+} from '@/api/user'
+import { isLoggedIn } from '@/api/auth'
 
 const route = useRoute()
+const router = useRouter()
 
 const loading = ref(false)
 const error = ref('')
@@ -19,7 +30,17 @@ const chapters = ref([])
 
 const coverFailed = ref(false)
 
+// 书架 & 打赏
+const shelfLoading = ref(false)
+const inShelf = ref(false)
+const tipDialogVisible = ref(false)
+const tipLoading = ref(false)
+const tipAmount = ref(1)
+const tipMessage = ref('')
+const account = ref(null)
+
 const novelId = computed(() => route.params.novelId)
+const loggedIn = isLoggedIn()
 
 const statusText = computed(() => (novel.value?.status === 1 ? '已完结' : '连载中'))
 const wordCount = computed(() => {
@@ -31,6 +52,9 @@ const firstChapter = computed(() => chapters.value[0] || null)
 const cover = computed(() =>
   novel.value?.coverUrl && !coverFailed.value ? novel.value.coverUrl : '',
 )
+const tipRequestNo = computed(
+  () => `TIP-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+)
 
 function formatTime(value) {
   return value ? String(value).replace('T', ' ').slice(0, 16) : '—'
@@ -40,12 +64,17 @@ function formatPrice(value) {
   return Number(value || 0).toFixed(2)
 }
 
+function goLogin() {
+  router.push({ path: '/login', query: { redirect: route.fullPath } })
+}
+
 async function loadDetail() {
   loading.value = true
   error.value = ''
   coverFailed.value = false
   try {
     novel.value = await getNovelDetail(novelId.value)
+    if (loggedIn) await refreshShelfStatus()
   } catch (err) {
     error.value = getErrorMessage(err)
     novel.value = null
@@ -71,6 +100,96 @@ async function loadChapters() {
 function reloadAll() {
   loadDetail()
   loadChapters()
+}
+
+async function refreshShelfStatus() {
+  if (!loggedIn || !novelId.value) return
+  try {
+    const data = await getBookshelf({ page: 1, pageSize: 999 })
+    const ids = (data?.list || []).map((b) => String(b.novelId))
+    inShelf.value = ids.includes(String(novelId.value))
+  } catch {
+    // 状态刷新失败不影响主流程
+  }
+}
+
+async function toggleShelf() {
+  if (!loggedIn) {
+    goLogin()
+    return
+  }
+  shelfLoading.value = true
+  try {
+    if (inShelf.value) {
+      await ElMessageBox.confirm(
+        `将《${novel.value.title}》从书架移出？`,
+        '移出书架',
+        { type: 'warning' },
+      )
+      await removeFromBookshelf(novelId.value)
+      inShelf.value = false
+      ElMessage.success('已移出书架')
+    } else {
+      await addToBookshelf(novelId.value)
+      inShelf.value = true
+      ElMessage.success('已加入书架')
+    }
+  } catch (err) {
+    if (err !== 'cancel') {
+      ElMessage.error(getErrorMessage(err, '书架操作失败'))
+    }
+  } finally {
+    shelfLoading.value = false
+  }
+}
+
+async function openTipDialog() {
+  if (!loggedIn) {
+    goLogin()
+    return
+  }
+  try {
+    account.value = await getAccount()
+  } catch {
+    account.value = null
+  }
+  tipAmount.value = 1
+  tipMessage.value = ''
+  tipDialogVisible.value = true
+}
+
+async function submitTip() {
+  if (tipLoading.value) return
+  const amount = Number(tipAmount.value)
+  if (!(amount > 0)) {
+    ElMessage.warning('请输入有效打赏金额')
+    return
+  }
+  tipLoading.value = true
+  try {
+    const result = await tipNovel({
+      novelId: String(novelId.value),
+      amount: amount.toFixed(2),
+      message: tipMessage.value.trim(),
+      requestNo: tipRequestNo.value,
+    })
+    const paid = Number(result.amount || amount).toFixed(2)
+    ElMessage.success(
+      result.duplicate
+        ? '该请求已处理，未重复扣款'
+        : `打赏成功，已支付 ¥${paid}`,
+    )
+    tipDialogVisible.value = false
+  } catch (err) {
+    const msg = getErrorMessage(err, '打赏失败')
+    if (/余额不足/.test(msg)) {
+      ElMessage.warning(`${msg} — 请先前往「我的书院」充值`)
+    } else {
+      ElMessage.error(msg)
+    }
+  } finally {
+    tipLoading.value = false
+  }
 }
 
 watch(
@@ -191,6 +310,23 @@ watch(
             >
               开始阅读
             </el-button>
+            <el-button
+              size="large"
+              :type="inShelf ? 'success' : 'default'"
+              :icon="inShelf ? Check : Star"
+              :loading="shelfLoading"
+              @click="toggleShelf"
+            >
+              {{ inShelf ? '已在书架' : '加入书架' }}
+            </el-button>
+            <el-button
+              type="warning"
+              size="large"
+              :icon="Money"
+              @click="openTipDialog"
+            >
+              打赏作者
+            </el-button>
             <el-button v-if="firstChapter" size="large" @click="loadChapters">
               刷新目录
             </el-button>
@@ -238,6 +374,63 @@ watch(
         </ul>
       </section>
     </template>
+
+    <el-dialog
+      v-model="tipDialogVisible"
+      title="打赏作者"
+      width="420px"
+      append-to-body
+      :close-on-click-modal="false"
+    >
+      <div class="tip-dialog-body">
+        <p class="tip-title">
+          为《<strong>{{ novel?.title }}</strong>》打赏
+        </p>
+        <p v-if="account" class="tip-balance">
+          当前余额：<strong>¥{{ Number(account.balance).toFixed(2) }}</strong>
+        </p>
+        <el-form label-position="top">
+          <el-form-item label="打赏金额（元）">
+            <el-radio-group v-model="tipAmount" size="default">
+              <el-radio-button :value="1">¥1</el-radio-button>
+              <el-radio-button :value="5">¥5</el-radio-button>
+              <el-radio-button :value="10">¥10</el-radio-button>
+              <el-radio-button :value="20">¥20</el-radio-button>
+              <el-radio-button :value="50">¥50</el-radio-button>
+            </el-radio-group>
+            <el-input-number
+              v-model="tipAmount"
+              :min="0.01"
+              :max="99999999.99"
+              :precision="2"
+              :step="1"
+              size="small"
+              style="margin-left: 10px"
+            />
+          </el-form-item>
+          <el-form-item label="留言（可选）">
+            <el-input
+              v-model="tipMessage"
+              type="textarea"
+              :rows="2"
+              maxlength="200"
+              show-word-limit
+              placeholder="给作者留个言"
+            />
+          </el-form-item>
+        </el-form>
+      </div>
+      <template #footer>
+        <el-button @click="tipDialogVisible = false">取消</el-button>
+        <el-button
+          type="warning"
+          :loading="tipLoading"
+          @click="submitTip"
+        >
+          确认打赏 ¥{{ Number(tipAmount).toFixed(2) }}
+        </el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -597,5 +790,31 @@ watch(
   .chapter-meta {
     padding-left: 48px;
   }
+}
+
+.tip-dialog-body {
+  padding: 6px 0 4px;
+}
+
+.tip-title {
+  margin: 0 0 4px;
+  color: #445068;
+  font-size: 13px;
+}
+
+.tip-title strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.tip-balance {
+  margin: 0 0 14px;
+  color: #8793a5;
+  font-size: 12px;
+}
+
+.tip-balance strong {
+  color: #b06a32;
+  font-weight: 600;
 }
 </style>

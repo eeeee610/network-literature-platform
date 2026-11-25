@@ -14,8 +14,6 @@ import {
   getTips,
   getTransactions,
   removeFromBookshelf,
-  subscribeChapter,
-  tipNovel,
   updateProfile,
 } from '@/api/user'
 
@@ -26,12 +24,10 @@ const account = ref(null)
 const initialLoading = ref(true)
 const initialError = ref('')
 const savingProfile = ref(false)
-const submitting = reactive({ shelf: false, subscribe: false, tip: false })
+const submitting = reactive({ shelf: false })
 const loading = reactive({ shelf: false, subscriptions: false, tips: false, transactions: false })
 const profileForm = reactive({ nickname: '', avatarUrl: '', email: '', phone: '' })
 const shelfForm = reactive({ novelId: '' })
-const subscribeForm = reactive({ chapterId: '', requestNo: '' })
-const tipForm = reactive({ novelId: '', chapterId: '', amount: 1, message: '', requestNo: '' })
 const bookshelf = ref({ list: [], total: 0, page: 1, pageSize: 6 })
 const subscriptions = ref({ list: [], total: 0, page: 1, pageSize: 10 })
 const tips = ref({ list: [], total: 0, page: 1, pageSize: 10 })
@@ -177,27 +173,6 @@ async function removeShelf(row) {
   await loadBookshelf()
 }
 
-async function subscribe() {
-  if (!/^\d+$/.test(subscribeForm.chapterId.trim())) {
-    ElMessage.warning('请输入有效的数字章节 ID')
-    return
-  }
-  submitting.subscribe = true
-  try {
-    const result = await subscribeChapter({
-      chapterId: subscribeForm.chapterId.trim(),
-      requestNo: subscribeForm.requestNo,
-    })
-    ElMessage.success(result.duplicate ? '该章节已订阅，本次未重复扣费' : `订阅成功，已扣 ¥${money(result.paidAmount)}`)
-    subscribeForm.chapterId = ''
-    subscribeForm.requestNo = newRequestNo('SUB')
-    subscriptions.value.page = 1
-    await Promise.all([refreshAccount(), loadSubscriptions()])
-  } finally {
-    submitting.subscribe = false
-  }
-}
-
 async function refund(row) {
   await ElMessageBox.confirm(
     `将退回 ¥${money(row.paidAmount)}。取消后，当前规则不允许重新订阅该章节，是否继续？`,
@@ -207,35 +182,6 @@ async function refund(row) {
   await cancelSubscription(row.chapterId)
   ElMessage.success('订阅已取消，退款已计入账户流水')
   await Promise.all([refreshAccount(), loadSubscriptions()])
-}
-
-async function submitTip() {
-  if (!/^\d+$/.test(tipForm.novelId.trim())) {
-    ElMessage.warning('请输入有效的数字作品 ID')
-    return
-  }
-  if (tipForm.chapterId && !/^\d+$/.test(tipForm.chapterId.trim())) {
-    ElMessage.warning('章节 ID 须为数字，或留空表示整本书打赏')
-    return
-  }
-  submitting.tip = true
-  try {
-    const result = await tipNovel({
-      novelId: tipForm.novelId.trim(),
-      chapterId: tipForm.chapterId.trim() || null,
-      amount: Number(tipForm.amount),
-      message: tipForm.message.trim(),
-      requestNo: tipForm.requestNo,
-    })
-    ElMessage.success(result.duplicate ? '该请求已处理，未重复扣款' : `打赏成功，已支付 ¥${money(result.amount)}`)
-    tipForm.message = ''
-    tipForm.requestNo = newRequestNo('TIP')
-    tips.value.page = 1
-    tipDirection.value = 'OUT'
-    await Promise.all([refreshAccount(), loadTips()])
-  } finally {
-    submitting.tip = false
-  }
 }
 
 async function signOut() {
@@ -252,8 +198,6 @@ watch(tipDirection, () => {
   loadTips()
 })
 onMounted(async () => {
-  subscribeForm.requestNo = newRequestNo('SUB')
-  tipForm.requestNo = newRequestNo('TIP')
   await loadOverview()
 })
 </script>
@@ -334,45 +278,39 @@ onMounted(async () => {
 
             <div class="trade-stack">
               <section class="panel trade-panel">
-                <div class="panel-title"><h3>订阅 VIP 章节</h3><span>价格由章节信息决定</span></div>
-                <el-form label-position="top" @submit.prevent="subscribe">
-                  <el-form-item label="章节 ID" required>
-                    <el-input v-model="subscribeForm.chapterId" placeholder="从作品目录获取章节 ID" />
-                  </el-form-item>
-                  <el-form-item label="请求号（防止重复扣款）">
-                    <el-input v-model="subscribeForm.requestNo" readonly>
-                      <template #append><el-button @click="subscribeForm.requestNo = newRequestNo('SUB')">更换</el-button></template>
-                    </el-input>
-                  </el-form-item>
-                  <el-button type="primary" :loading="submitting.subscribe" @click="subscribe">确认订阅并扣费</el-button>
-                </el-form>
+                <div class="panel-title"><h3>📖 加入书架</h3><span>在作品详情页一键收藏，无需手动输入作品 ID</span></div>
+                <p class="help-text">
+                  浏览书城或榜单 → 打开任意作品 → 点击页面顶部的
+                  <strong>「加入书架」</strong>
+                  按钮即可收藏。按钮状态会自动同步。
+                </p>
+                <RouterLink to="/bookstore" class="inline-link">前往书城 &raquo;</RouterLink>
               </section>
 
               <section class="panel trade-panel">
-                <div class="panel-title"><h3>打赏作品</h3><span>收款人由作品作者自动确定</span></div>
-                <el-form label-position="top" @submit.prevent="submitTip">
-                  <div class="two-columns">
-                    <el-form-item label="作品 ID" required><el-input v-model="tipForm.novelId" /></el-form-item>
-                    <el-form-item label="章节 ID（选填）"><el-input v-model="tipForm.chapterId" placeholder="留空打赏整本书" /></el-form-item>
-                  </div>
-                  <el-form-item label="打赏金额（元）" required>
-                    <el-input-number v-model="tipForm.amount" :min="0.01" :max="9999999999.99" :precision="2" :step="1" />
-                  </el-form-item>
-                  <el-form-item label="留言"><el-input v-model="tipForm.message" maxlength="200" show-word-limit /></el-form-item>
-                  <el-form-item label="请求号（防止重复打赏）"><el-input v-model="tipForm.requestNo" readonly /></el-form-item>
-                  <el-button type="warning" :loading="submitting.tip" @click="submitTip">确认打赏</el-button>
-                </el-form>
+                <div class="panel-title"><h3>💎 VIP 章节订阅</h3><span>进入 VIP 章节时自动显示订阅按钮</span></div>
+                <p class="help-text">
+                  目录中带 VIP 标识的章节，点击后会进入锁定阅读界面，
+                  <strong>「立即订阅 ¥XX.XX」</strong>
+                  按钮直接完成订阅、扣费和正文加载，无需手动输入章节 ID。
+                </p>
+                <RouterLink to="/bookstore" class="inline-link">浏览 VIP 作品 &raquo;</RouterLink>
+              </section>
+
+              <section class="panel trade-panel">
+                <div class="panel-title"><h3>🎁 打赏作者</h3><span>作品详情页一键打赏</span></div>
+                <p class="help-text">
+                  在作品详情页点击 <strong>「打赏作者」</strong>，
+                  选择金额并可选留言后提交。系统自动从余额扣费，交易明细可在下方「账户流水」Tab 查看。
+                </p>
+                <RouterLink to="/rankings" class="inline-link">前往榜单 &raquo;</RouterLink>
               </section>
             </div>
           </div>
 
           <section v-else-if="activeTab === 'bookshelf'" class="panel">
-            <form class="inline-action" @submit.prevent="addShelf">
-              <el-input v-model="shelfForm.novelId" placeholder="输入作品 ID 加入书架" clearable />
-              <el-button type="primary" native-type="submit" :loading="submitting.shelf">加入书架</el-button>
-            </form>
             <div v-loading="loading.shelf" class="section-body">
-              <el-empty v-if="!bookshelf.list.length" description="书架还是空的，输入作品 ID 收藏第一部作品" />
+              <el-empty v-if="!bookshelf.list.length" description="书架还是空的，前往书城收藏喜欢的作品吧。" />
               <div v-else class="book-grid">
                 <article v-for="book in bookshelf.list" :key="book.novelId" class="book-entry">
                   <div class="book-cover"><img v-if="book.coverUrl" :src="book.coverUrl" :alt="book.title" /><span v-else>{{ book.title?.slice(0, 1) }}</span></div>
