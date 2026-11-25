@@ -14,6 +14,18 @@ const routes = [
     meta: { title: '登录', area: 'reader' },
   },
   {
+    path: '/register',
+    name: 'Register',
+    component: () => import('@/views/LoginView.vue'),
+    meta: { title: '注册', area: 'reader' },
+  },
+  {
+    path: '/account',
+    name: 'UserCenter',
+    component: () => import('@/views/user/UserCenterView.vue'),
+    meta: { title: '我的书院', area: 'reader', requiresAuth: true },
+  },
+  {
     path: '/',
     component: ReaderLayout,
     redirect: '/rankings',

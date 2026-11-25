@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.novel.platform.modules.user.mapper.UserTradeMapper">
+
+    <resultMap id="SubscriptionItemMap" type="com.novel.platform.modules.user.dto.SubscriptionItem">
+        <constructor>
+            <arg column="chapter_id" javaType="String"/>
+            <arg column="novel_id" javaType="String"/>
+            <arg column="novel_title" javaType="String"/>
+            <arg column="chapter_no" javaType="Integer"/>
+            <arg column="chapter_title" javaType="String"/>
+            <arg column="unit_price" javaType="java.math.BigDecimal"/>
+            <arg column="paid_amount" javaType="java.math.BigDecimal"/>
+            <arg column="txn_no" javaType="String"/>
+            <arg column="request_no" javaType="String"/>
+            <arg column="status" javaType="String"/>
+            <arg column="subscribed_at" javaType="String"/>
+            <arg column="refunded_at" javaType="String"/>
+            <arg column="balance_after" javaType="java.math.BigDecimal"/>
+            <arg column="refunded" javaType="Boolean"/>
+        </constructor>
+    </resultMap>
+
+    <resultMap id="TipItemMap" type="com.novel.platform.modules.user.dto.TipItem">
+        <constructor>
+            <arg column="tip_id" javaType="String"/>
+            <arg column="tip_no" javaType="String"/>
+            <arg column="request_no" javaType="String"/>
+            <arg column="from_user_id" javaType="String"/>
+            <arg column="to_user_id" javaType="String"/>
+            <arg column="counterparty_name" javaType="String"/>
+            <arg column="novel_id" javaType="String"/>
+            <arg column="novel_title" javaType="String"/>
+            <arg column="chapter_id" javaType="String"/>
+            <arg column="chapter_title" javaType="String"/>
+            <arg column="amount" javaType="java.math.BigDecimal"/>
+            <arg column="message" javaType="String"/>
+            <arg column="status" javaType="String"/>
+            <arg column="out_txn_no" javaType="String"/>
+            <arg column="in_txn_no" javaType="String"/>
+            <arg column="created_at" javaType="String"/>
+            <arg column="refunded_at" javaType="String"/>
+            <arg column="direction" javaType="String"/>
+        </constructor>
+    </resultMap>
+
+    <sql id="SubscriptionColumns">
+        s.chapter_id, s.novel_id, n.title AS novel_title, c.chapter_no, c.title AS chapter_title,
+        s.unit_price, s.paid_amount, s.txn_no, s.request_no, s.status,
+        DATE_FORMAT(s.subscribed_at, '%Y-%m-%dT%H:%i:%s+08:00') AS subscribed_at,
+        DATE_FORMAT(s.refunded_at, '%Y-%m-%dT%H:%i:%s+08:00') AS refunded_at,
+        NULL AS balance_after, NULL AS refunded
+    </sql>
+
+    <sql id="SubscriptionFrom">
+        FROM chapter_subscription s
+        JOIN novel n ON n.novel_id = s.novel_id
+        JOIN chapter c ON c.chapter_id = s.chapter_id
+    </sql>
+
+    <sql id="TipColumns">
+        t.tip_id, t.tip_no, t.request_no, t.from_user_id, t.to_user_id,
+        cp.nickname AS counterparty_name, t.novel_id, n.title AS novel_title,
+        t.chapter_id, c.title AS chapter_title, t.amount, t.message, t.status,
+        t.out_txn_no, t.in_txn_no,
+        DATE_FORMAT(t.created_at, '%Y-%m-%dT%H:%i:%s+08:00') AS created_at,
+        DATE_FORMAT(t.refunded_at, '%Y-%m-%dT%H:%i:%s+08:00') AS refunded_at
+    </sql>
+
+    <update id="subscribe" statementType="CALLABLE">
+        {call sp_subscribe_chapter(
+            #{userId,mode=IN,jdbcType=BIGINT},
+            #{chapterId,mode=IN,jdbcType=BIGINT},
+            #{requestNo,mode=IN,jdbcType=VARCHAR},
+            #{resultCode,mode=OUT,jdbcType=VARCHAR},
+            #{message,mode=OUT,jdbcType=VARCHAR},
+            #{txnNo,mode=OUT,jdbcType=CHAR},
+            #{balanceAfter,mode=OUT,jdbcType=DECIMAL}
+        )}
+    </update>
+
+    <update id="tip" statementType="CALLABLE">
+        {call sp_tip_author(
+            #{fromUserId,mode=IN,jdbcType=BIGINT},
+            #{toUserId,mode=IN,jdbcType=BIGINT},
+            #{novelId,mode=IN,jdbcType=BIGINT},
+            #{chapterId,mode=IN,jdbcType=BIGINT},
+            #{amount,mode=IN,jdbcType=DECIMAL},
+            #{message,mode=IN,jdbcType=VARCHAR},
+            #{requestNo,mode=IN,jdbcType=VARCHAR},
+            #{resultCode,mode=OUT,jdbcType=VARCHAR},
+            #{resultMessage,mode=OUT,jdbcType=VARCHAR},
+            #{tipId,mode=OUT,jdbcType=BIGINT},
+            #{tipNo,mode=OUT,jdbcType=CHAR},
+            #{fromBalanceAfter,mode=OUT,jdbcType=DECIMAL},
+            #{toBalanceAfter,mode=OUT,jdbcType=DECIMAL}
+        )}
+    </update>
+
+    <select id="selectNovelAuthorId" resultType="long">
+        SELECT author_id FROM novel WHERE novel_id = #{novelId}
+    </select>
+
+    <select id="countTransactions" resultType="long">
+        SELECT COUNT(*) FROM account_transaction WHERE user_id = #{userId}
+    </select>
+
+    <select id="selectTransactionPage" resultType="com.novel.platform.modules.user.entity.AccountTransaction">
+        SELECT txn_id, txn_no, user_id, biz_type, direction, amount, balance_before, balance_after,
+               biz_key, related_type, related_id, request_no, remark, created_at
+        FROM account_transaction
+        WHERE user_id = #{userId}
+        ORDER BY txn_id DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="selectAccountForUpdate" resultType="com.novel.platform.modules.user.entity.UserAccount">
+        SELECT user_id, balance, created_at, updated_at FROM user_account
+        WHERE user_id = #{userId} FOR UPDATE
+    </select>
+
+    <select id="selectSubscriptionForUpdate" resultType="com.novel.platform.modules.user.entity.ChapterSubscription">
+        SELECT user_id, chapter_id, novel_id, unit_price, paid_amount, txn_no, request_no,
+               status, subscribed_at, refunded_at
+        FROM chapter_subscription
+        WHERE user_id = #{userId} AND chapter_id = #{chapterId}
+        FOR UPDATE
+    </select>
+
+    <update id="markSubscriptionRefunded">
+        UPDATE chapter_subscription
+        SET status = 'REFUNDED', refunded_at = CURRENT_TIMESTAMP(6)
+        WHERE user_id = #{userId} AND chapter_id = #{chapterId} AND status = 'ACTIVE'
+    </update>
+
+    <select id="selectSubscription" resultMap="SubscriptionItemMap">
+        SELECT <include refid="SubscriptionColumns"/>
+        <include refid="SubscriptionFrom"/>
+        WHERE s.user_id = #{userId} AND s.chapter_id = #{chapterId}
+    </select>
+
+    <select id="selectSubscriptionByRequestNo" resultMap="SubscriptionItemMap">
+        SELECT <include refid="SubscriptionColumns"/>
+        <include refid="SubscriptionFrom"/>
+        WHERE s.user_id = #{userId} AND s.request_no = #{requestNo}
+    </select>
+
+    <select id="countSubscriptions" resultType="long">
+        SELECT COUNT(*) FROM chapter_subscription WHERE user_id = #{userId}
+    </select>
+
+    <select id="selectSubscriptionPage" resultMap="SubscriptionItemMap">
+        SELECT <include refid="SubscriptionColumns"/>
+        <include refid="SubscriptionFrom"/>
+        WHERE s.user_id = #{userId}
+        ORDER BY s.subscribed_at DESC, s.chapter_id DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="countTips" resultType="long">
+        SELECT COUNT(*) FROM reward_tip t
+        WHERE (#{direction} = 'OUT' AND t.from_user_id = #{userId})
+           OR (#{direction} = 'IN' AND t.to_user_id = #{userId})
+    </select>
+
+    <select id="selectTipPage" resultMap="TipItemMap">
+        SELECT <include refid="TipColumns"/>, #{direction} AS direction
+        FROM reward_tip t
+        JOIN novel n ON n.novel_id = t.novel_id
+        LEFT JOIN chapter c ON c.chapter_id = t.chapter_id
+        JOIN app_user cp ON cp.user_id = IF(#{direction} = 'OUT', t.to_user_id, t.from_user_id)
+        WHERE (#{direction} = 'OUT' AND t.from_user_id = #{userId})
+           OR (#{direction} = 'IN' AND t.to_user_id = #{userId})
+        ORDER BY t.created_at DESC, t.tip_id DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="selectTipByRequestNo" resultMap="TipItemMap">
+        SELECT <include refid="TipColumns"/>, 'OUT' AS direction
+        FROM reward_tip t
+        JOIN novel n ON n.novel_id = t.novel_id
+        LEFT JOIN chapter c ON c.chapter_id = t.chapter_id
+        JOIN app_user cp ON cp.user_id = t.to_user_id
+        WHERE t.from_user_id = #{userId} AND t.request_no = #{requestNo}
+    </select>
+</mapper>

@@ -1,20 +1,36 @@
 <script setup>
-import { reactive, ref } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Lock, User } from '@element-plus/icons-vue'
-import { isAdmin, login } from '@/api/auth'
+import { isAdmin, login, register } from '@/api/auth'
 
 const router = useRouter()
 const route = useRoute()
 const formRef = ref(null)
 const loading = ref(false)
-const form = reactive({ username: '', password: '' })
+const form = reactive({ username: '', password: '', nickname: '', email: '', phone: '' })
+const isRegister = computed(() => route.path === '/register')
 
-const rules = {
-  username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
-  password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
-}
+const rules = computed(() => ({
+  username: [
+    { required: true, message: '请输入用户名', trigger: 'blur' },
+    ...(isRegister.value
+      ? [{ pattern: /^[A-Za-z0-9_]{3,50}$/, message: '请输入 3～50 位字母、数字或下划线', trigger: 'blur' }]
+      : []),
+  ],
+  password: [
+    { required: true, message: '请输入密码', trigger: 'blur' },
+    ...(isRegister.value
+      ? [{ min: 8, max: 72, message: '密码长度须为 8～72 位', trigger: 'blur' }]
+      : []),
+  ],
+  nickname: isRegister.value
+    ? [{ required: true, message: '请输入昵称', trigger: 'blur' }]
+    : [],
+}))
+
+watch(isRegister, () => formRef.value?.clearValidate())
 
 async function submit() {
   if (!formRef.value) {
@@ -26,13 +42,23 @@ async function submit() {
   }
   loading.value = true
   try {
-    await login({ username: form.username.trim(), password: form.password })
-    ElMessage.success('登录成功')
+    const payload = { username: form.username.trim(), password: form.password }
+    if (isRegister.value) {
+      await register({
+        ...payload,
+        nickname: form.nickname.trim(),
+        email: form.email.trim(),
+        phone: form.phone.trim(),
+      })
+    } else {
+      await login(payload)
+    }
+    ElMessage.success(isRegister.value ? '注册成功，已为你登录' : '登录成功')
     const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : ''
     if (redirect.startsWith('/')) {
       router.replace(redirect)
     } else {
-      router.replace(isAdmin() ? '/admin/dashboard' : '/rankings')
+      router.replace(isAdmin() ? '/admin/dashboard' : '/account')
     }
   } catch {
     // 错误提示由 request.js 统一处理
@@ -69,11 +95,16 @@ async function submit() {
 
     <section class="login-panel">
       <div class="login-card">
-        <p class="login-eyebrow">SIGN IN / 登录</p>
-        <h2>进入文枢书院</h2>
-        <p class="login-hint">使用平台账号登录，管理员账号将进入运营后台。</p>
+        <p class="login-eyebrow">{{ isRegister ? 'JOIN US / 注册' : 'SIGN IN / 登录' }}</p>
+        <h2>{{ isRegister ? '创建读者账号' : '进入文枢书院' }}</h2>
+        <p class="login-hint">
+          {{ isRegister ? '注册即创建个人书架和零钱账户，初始余额为 0。' : '使用平台账号登录，管理员账号将进入运营后台。' }}
+        </p>
 
         <el-form ref="formRef" :model="form" :rules="rules" label-position="top" @submit.prevent="submit">
+          <el-form-item v-if="isRegister" label="昵称" prop="nickname">
+            <el-input v-model="form.nickname" size="large" maxlength="50" placeholder="用于评论区与打赏记录" />
+          </el-form-item>
           <el-form-item label="用户名" prop="username">
             <el-input
               v-model="form.username"
@@ -91,18 +122,28 @@ async function submit() {
               show-password
               :prefix-icon="Lock"
               placeholder="请输入密码"
-              autocomplete="current-password"
+              :autocomplete="isRegister ? 'new-password' : 'current-password'"
               @keyup.enter="submit"
             />
           </el-form-item>
+          <template v-if="isRegister">
+            <el-form-item label="邮箱（选填）" prop="email">
+              <el-input v-model="form.email" size="large" type="email" placeholder="name@example.com" />
+            </el-form-item>
+            <el-form-item label="手机号（选填）" prop="phone">
+              <el-input v-model="form.phone" size="large" maxlength="20" placeholder="用于账号资料识别" />
+            </el-form-item>
+          </template>
           <el-button class="login-submit" type="primary" size="large" :loading="loading" @click="submit">
-            登录
+            {{ isRegister ? '注册并登录' : '登录' }}
           </el-button>
         </el-form>
 
         <div class="login-footer">
+          <RouterLink :to="isRegister ? '/login' : '/register'">
+            {{ isRegister ? '已有账号，去登录' : '新读者，创建账号' }}
+          </RouterLink>
           <RouterLink to="/rankings">先逛逛榜单广场</RouterLink>
-          <span>账号由平台注册流程创建</span>
         </div>
       </div>
     </section>

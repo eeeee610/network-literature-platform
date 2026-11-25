@@ -31,8 +31,27 @@ export function clearSession() {
   localStorage.removeItem(USER_KEY)
 }
 
+export function updateStoredUser(profile) {
+  const current = getStoredUser() || {}
+  localStorage.setItem(USER_KEY, JSON.stringify({ ...current, ...profile }))
+}
+
 export async function login(payload) {
   const data = await request.post('/user/auth/login', payload)
   setSession(data)
   return data
+}
+
+export async function register(payload) {
+  const data = await request.post('/user/auth/register', payload)
+  setSession(data)
+  return data
+}
+
+export async function logout() {
+  try {
+    await request.post('/user/auth/logout')
+  } finally {
+    clearSession()
+  }
 }

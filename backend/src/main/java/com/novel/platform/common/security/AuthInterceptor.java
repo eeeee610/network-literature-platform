@@ -72,7 +72,8 @@ public class AuthInterceptor implements HandlerInterceptor {
     }
 
     private boolean isPublic(String path, String method) {
-        if ("POST".equalsIgnoreCase(method) && "/api/user/auth/login".equals(path)) {
+        if ("POST".equalsIgnoreCase(method)
+                && ("/api/user/auth/login".equals(path) || "/api/user/auth/register".equals(path))) {
             return true;
         }
         if (path.startsWith("/api/interaction/ranking")) {
