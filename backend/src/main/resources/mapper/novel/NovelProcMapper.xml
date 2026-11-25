@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.novel.platform.modules.novel.mapper.NovelProcMapper">
+
+    <update id="createNovel" statementType="CALLABLE">
+        {call sp_create_novel(
+            #{authorId,mode=IN,jdbcType=BIGINT},
+            #{title,mode=IN,jdbcType=VARCHAR},
+            #{coverUrl,mode=IN,jdbcType=VARCHAR},
+            #{description,mode=IN,jdbcType=VARCHAR},
+            #{tagIdsJson,mode=IN,jdbcType=VARCHAR},
+            #{novelId,mode=OUT,jdbcType=BIGINT}
+        )}
+    </update>
+
+    <update id="saveChapterDraft" statementType="CALLABLE">
+        {call sp_save_chapter_draft(
+            #{chapterId,mode=IN,jdbcType=BIGINT},
+            #{novelId,mode=IN,jdbcType=BIGINT},
+            #{title,mode=IN,jdbcType=VARCHAR},
+            #{content,mode=IN,jdbcType=LONGVARCHAR},
+            #{isVip,mode=IN,jdbcType=TINYINT},
+            #{vipPrice,mode=IN,jdbcType=DECIMAL},
+            #{chapterIdOut,mode=OUT,jdbcType=BIGINT}
+        )}
+    </update>
+
+    <update id="publishChapter" statementType="CALLABLE">
+        {call sp_publish_chapter(#{chapterId,mode=IN,jdbcType=BIGINT})}
+    </update>
+
+    <update id="offlineChapter" statementType="CALLABLE">
+        {call sp_offline_chapter(#{chapterId,mode=IN,jdbcType=BIGINT})}
+    </update>
+
+</mapper>
