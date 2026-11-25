@@ -2,10 +2,13 @@
 import { computed } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { currentUser, isLoggedIn, logout } from '@/api/auth'
+import { currentUser, isAdmin, isLoggedIn, logout } from '@/api/auth'
 
 const loggedIn = computed(() => isLoggedIn())
 const viewer = computed(() => currentUser())
+const role = computed(() => viewer.value?.role || '')
+const isAuthor = computed(() => role.value === 'AUTHOR')
+const isAdminRole = computed(() => isAdmin())
 
 async function handleLogout() {
   try {
@@ -31,7 +34,10 @@ async function handleLogout() {
 
         <nav class="site-nav">
           <RouterLink to="/bookstore">书城</RouterLink>
-          <RouterLink to="/author">创作台</RouterLink>
+          <RouterLink to="/rankings">榜单广场</RouterLink>
+          <RouterLink v-if="loggedIn" to="/account">我的书院</RouterLink>
+          <RouterLink v-if="isAuthor || isAdminRole" to="/author">创作台</RouterLink>
+          <RouterLink v-if="isAdminRole" to="/admin/dashboard">管理后台</RouterLink>
         </nav>
 
         <div class="header-actions">

@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute, useRouter, RouterLink } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import {
   ChatLineSquare,
@@ -13,11 +13,15 @@ import {
   SwitchButton,
   User,
 } from '@element-plus/icons-vue'
-import { clearSession, currentUser } from '@/api/auth'
+import { clearSession, currentUser, isLoggedIn } from '@/api/auth'
 
 const route = useRoute()
 const router = useRouter()
 const user = ref(currentUser())
+const loggedIn = computed(() => isLoggedIn())
+const role = computed(() => user.value?.role || '')
+const isAuthor = computed(() => role.value === 'AUTHOR')
+const isAdminRole = computed(() => role.value === 'ADMIN')
 
 const menus = [
   { path: '/admin/dashboard', label: '数据统计', icon: DataAnalysis },
@@ -58,6 +62,13 @@ function handleCommand(command) {
           <strong>文枢运营台</strong>
           <span>网络文学创作与阅读平台</span>
         </div>
+      </div>
+
+      <div class="sidebar-quick">
+        <RouterLink to="/bookstore" class="quick-link">书城</RouterLink>
+        <RouterLink to="/rankings" class="quick-link">榜单广场</RouterLink>
+        <RouterLink to="/account" class="quick-link">我的书院</RouterLink>
+        <RouterLink v-if="isAuthor || isAdminRole" to="/author" class="quick-link">创作台</RouterLink>
       </div>
 
       <div class="nav-caption">工作台</div>
@@ -154,5 +165,29 @@ function handleCommand(command) {
   .user-copy {
     display: none;
   }
+}
+
+.sidebar-quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  padding: 12px 18px 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.quick-link {
+  padding: 3px 10px;
+  color: #cfd6e2;
+  font-size: 12px;
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 3px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.quick-link:hover,
+.quick-link.router-link-active {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.16);
 }
 </style>

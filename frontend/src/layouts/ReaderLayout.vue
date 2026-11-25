@@ -10,10 +10,24 @@ const route = useRoute()
 const user = ref(currentUser())
 const loggedIn = computed(() => isLoggedIn())
 const admin = computed(() => isAdmin())
+const author = computed(() => user.value?.role === 'AUTHOR')
 
-const navItems = [
-  { path: '/rankings', label: '榜单广场', icon: Trophy },
-]
+const primaryNav = computed(() => {
+  const items = [
+    { path: '/rankings', label: '榜单广场' },
+    { path: '/bookstore', label: '书城' },
+  ]
+  if (loggedIn.value) {
+    items.push({ path: '/account', label: '我的书院' })
+  }
+  if (author.value || admin.value) {
+    items.push({ path: '/author', label: '创作台' })
+  }
+  if (admin.value) {
+    items.push({ path: '/admin/dashboard', label: '管理后台' })
+  }
+  return items
+})
 const novelIdInput = ref('')
 const searchLoading = ref(false)
 const searchInputRef = ref(null)
@@ -37,13 +51,7 @@ function handleCommand(command) {
     router.push('/login')
     return
   }
-  if (command === 'admin') {
-    router.push('/admin/dashboard')
-    return
-  }
-  if (command === 'reader') {
-    router.push('/rankings')
-  }
+  router.push(command)
 }
 
 function roleLabel(role) {
@@ -67,13 +75,12 @@ const activePath = computed(() => (route.path.startsWith('/novels') ? '/novels' 
 
         <nav class="reader-nav" aria-label="主导航">
           <RouterLink
-            v-for="item in navItems"
+            v-for="item in primaryNav"
             :key="item.path"
             :to="item.path"
             class="reader-nav-link"
-            :class="{ active: activePath === item.path }"
+            :class="{ active: route.path === item.path || (item.path === '/bookstore' && route.path === '/') }"
           >
-            <el-icon><component :is="item.icon" /></el-icon>
             {{ item.label }}
           </RouterLink>
           <button
@@ -82,7 +89,6 @@ const activePath = computed(() => (route.path.startsWith('/novels') ? '/novels' 
             :class="{ active: activePath === '/novels' }"
             @click="searchInputRef?.focus()"
           >
-            <el-icon><Reading /></el-icon>
             作品互动
           </button>
         </nav>
@@ -114,9 +120,12 @@ const activePath = computed(() => (route.path.startsWith('/novels') ? '/novels' 
               </button>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item v-if="admin" command="admin">进入运营后台</el-dropdown-item>
-                  <el-dropdown-item command="reader">榜单广场</el-dropdown-item>
-                  <el-dropdown-item command="logout" divided :icon="SwitchButton">退出登录</el-dropdown-item>
+                  <el-dropdown-item command="/bookstore">书城</el-dropdown-item>
+                  <el-dropdown-item command="/rankings">榜单广场</el-dropdown-item>
+                  <el-dropdown-item v-if="loggedIn" command="/account">我的书院</el-dropdown-item>
+                  <el-dropdown-item v-if="author || admin" command="/author">创作台</el-dropdown-item>
+                  <el-dropdown-item v-if="admin" command="/admin/dashboard">管理后台</el-dropdown-item>
+                  <el-dropdown-item command="logout" divided>退出登录</el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
