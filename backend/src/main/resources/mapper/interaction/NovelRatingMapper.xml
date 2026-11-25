@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.novel.platform.modules.interaction.mapper.NovelRatingMapper">
+
+    <sql id="ratingColumns">
+        r.rating_id,
+        r.user_id,
+        r.novel_id,
+        r.score,
+        r.review_content,
+        r.status,
+        r.review_audit_status,
+        r.created_at,
+        u.nickname,
+        u.avatar_url,
+        n.title AS novel_title
+    </sql>
+
+    <select id="selectPublicReviews" resultType="com.novel.platform.modules.interaction.dto.RatingRow">
+        SELECT <include refid="ratingColumns"/>
+        FROM novel_rating r
+        JOIN app_user u ON u.user_id = r.user_id
+        JOIN novel n ON n.novel_id = r.novel_id
+        WHERE r.novel_id = #{novelId}
+          AND r.status = 1
+          AND r.review_audit_status = 1
+        ORDER BY r.updated_at DESC, r.rating_id DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countPublicReviews" resultType="long">
+        SELECT COUNT(*)
+        FROM novel_rating r
+        WHERE r.novel_id = #{novelId}
+          AND r.status = 1
+          AND r.review_audit_status = 1
+    </select>
+
+    <select id="selectAdminReviews" resultType="com.novel.platform.modules.interaction.dto.RatingRow">
+        SELECT <include refid="ratingColumns"/>
+        FROM novel_rating r
+        JOIN app_user u ON u.user_id = r.user_id
+        JOIN novel n ON n.novel_id = r.novel_id
+        WHERE r.review_content IS NOT NULL
+        <if test="reviewAuditStatus != null">AND r.review_audit_status = #{reviewAuditStatus}</if>
+        ORDER BY r.updated_at DESC, r.rating_id DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countAdminReviews" resultType="long">
+        SELECT COUNT(*)
+        FROM novel_rating r
+        WHERE r.review_content IS NOT NULL
+        <if test="reviewAuditStatus != null">AND r.review_audit_status = #{reviewAuditStatus}</if>
+    </select>
+</mapper>
