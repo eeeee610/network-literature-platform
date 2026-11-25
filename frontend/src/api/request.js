@@ -1,48 +1,54 @@
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
-
-const TOKEN_KEY = 'novel_token'
+import { getToken, clearAuth } from '../utils/auth'
 
 const request = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
-  timeout: 8000,
+  baseURL: '/api',
+  timeout: 10000
 })
 
 request.interceptors.request.use((config) => {
-  const token = localStorage.getItem(TOKEN_KEY)
+  const token = getToken()
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
   return config
 })
 
+function redirectToLogin() {
+  clearAuth()
+  const current = window.location.pathname + window.location.search
+  if (!current.startsWith('/login')) {
+    window.location.href = `/login?redirect=${encodeURIComponent(current)}`
+  }
+}
+
 request.interceptors.response.use(
   (response) => {
     const body = response.data
-    if (!body || typeof body.code !== 'number') {
-      const error = new Error('接口响应格式不正确')
-      ElMessage.error(error.message)
-      return Promise.reject(error)
+    if (!body || typeof body.code === 'undefined') {
+      ElMessage.error('服务响应格式异常')
+      return Promise.reject(new Error('invalid response'))
     }
-    if (body.code !== 0) {
-      const error = new Error(body.message || '请求失败')
-      ElMessage.error(error.message)
-      return Promise.reject(error)
+    if (body.code === 0) {
+      return body.data
     }
-    return body.data
+    if (body.code === 40100) {
+      redirectToLogin()
+    } else {
+      ElMessage.error(body.message || '请求失败')
+    }
+    return Promise.reject(new Error(body.message || '请求失败'))
   },
   (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem(TOKEN_KEY)
-      localStorage.removeItem('novel_user')
-      if (!window.location.pathname.startsWith('/login')) {
-        window.location.assign('/login')
-      }
+    const body = error.response && error.response.data
+    if (body && body.code === 40100) {
+      redirectToLogin()
+    } else {
+      ElMessage.error((body && body.message) || '网络异常，请稍后重试')
     }
-    const message = error.response?.data?.message || '无法连接服务器，请确认后端已启动'
-    ElMessage.error(message)
     return Promise.reject(error)
-  },
+  }
 )
 
 export default request

@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @TableName("app_user")
 public class AppUser {
 
-    @TableId(value = "user_id", type = IdType.AUTO)
+    @TableId(type = IdType.AUTO)
     private Long userId;
     private String username;
     private String passwordHash;

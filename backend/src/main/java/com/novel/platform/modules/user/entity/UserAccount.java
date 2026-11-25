@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @TableName("user_account")
 public class UserAccount {
 
-    @TableId(value = "user_id", type = IdType.INPUT)
+    @TableId(type = IdType.INPUT)
     private Long userId;
     private BigDecimal balance;
     private LocalDateTime createdAt;

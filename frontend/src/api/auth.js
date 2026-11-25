@@ -1,13 +1,13 @@
-import userRequest from './userRequest'
+import request from './request'
 
-export function login(payload) {
-  return userRequest.post('/auth/login', payload)
+export function register(data) {
+  return request.post('/auth/register', data)
 }
 
-export function register(payload) {
-  return userRequest.post('/auth/register', payload)
+export function login(data) {
+  return request.post('/auth/login', data)
 }
 
-export function getMe() {
-  return userRequest.get('/auth/me')
+export function fetchMe() {
+  return request.get('/auth/me')
 }

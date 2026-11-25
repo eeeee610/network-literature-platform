@@ -1,11 +1,8 @@
 package com.novel.platform.modules.user.controller;
 
 import com.novel.platform.common.api.ApiResponse;
-import com.novel.platform.modules.user.security.UserContext;
-import com.novel.platform.modules.user.dto.AuthResponse;
-import com.novel.platform.modules.user.dto.LoginRequest;
-import com.novel.platform.modules.user.dto.RegisterRequest;
-import com.novel.platform.modules.user.dto.UserProfile;
+import com.novel.platform.modules.user.model.Requests;
+import com.novel.platform.modules.user.model.Views;
 import com.novel.platform.modules.user.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,17 +22,17 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ApiResponse<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
+    public ApiResponse<Views.RegisterResult> register(@Valid @RequestBody Requests.Register request) {
         return ApiResponse.success(authService.register(request));
     }
 
     @PostMapping("/login")
-    public ApiResponse<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
+    public ApiResponse<Views.LoginResult> login(@Valid @RequestBody Requests.Login request) {
         return ApiResponse.success(authService.login(request));
     }
 
     @GetMapping("/me")
-    public ApiResponse<UserProfile> me() {
-        return ApiResponse.success(authService.me(UserContext.requireUserId()));
+    public ApiResponse<Views.UserInfo> me() {
+        return ApiResponse.success(authService.me());
     }
 }

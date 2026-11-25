@@ -4,11 +4,12 @@ import com.novel.platform.common.api.ApiResponse;
 import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -16,67 +17,58 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
-import java.util.stream.Collectors;
-
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<ApiResponse<Void>> handleBusinessException(BusinessException exception) {
-        return ResponseEntity.status(exception.getStatus())
-                .body(ApiResponse.error(exception.getCode(), exception.getMessage()));
+    public ResponseEntity<ApiResponse<Void>> handleBusiness(BusinessException e) {
+        return ResponseEntity.status(e.getStatus()).body(ApiResponse.error(e.getCode(), e.getMessage()));
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<Void>> handleMethodArgumentNotValid(MethodArgumentNotValidException exception) {
-        String message = exception.getBindingResult().getFieldErrors().stream()
-                .map(error -> error.getField() + ": " + error.getDefaultMessage())
-                .collect(Collectors.joining("; "));
-        return badRequest(message);
+    @ExceptionHandler({MethodArgumentNotValidException.class, BindException.class})
+    public ResponseEntity<ApiResponse<Void>> handleInvalidBody(BindException e) {
+        FieldError fieldError = e.getBindingResult().getFieldError();
+        String message = fieldError == null
+                ? "请求参数校验失败"
+                : fieldError.getField() + ": " + fieldError.getDefaultMessage();
+        return ResponseEntity.badRequest().body(ApiResponse.error(ErrorCodes.PARAM_INVALID, message));
     }
 
-    @ExceptionHandler(BindException.class)
-    public ResponseEntity<ApiResponse<Void>> handleBindException(BindException exception) {
-        String message = exception.getBindingResult().getFieldErrors().stream()
-                .map(error -> error.getField() + ": " + error.getDefaultMessage())
-                .collect(Collectors.joining("; "));
-        return badRequest(message);
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ApiResponse<Void>> handleConstraint(ConstraintViolationException e) {
+        String message = e.getConstraintViolations().stream()
+                .findFirst()
+                .map(v -> v.getPropertyPath() + ": " + v.getMessage())
+                .orElse("请求参数校验失败");
+        return ResponseEntity.badRequest().body(ApiResponse.error(ErrorCodes.PARAM_INVALID, message));
     }
 
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ApiResponse<Void>> handleUnreadableBody(HttpMessageNotReadableException exception) {
-        return badRequest("请求体格式不正确");
-    }
-
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ApiResponse<Void>> handleDataIntegrity(DataIntegrityViolationException exception) {
-        log.warn("Data integrity violation", exception);
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(ApiResponse.error(40900, "数据关联不存在或记录重复"));
-    }
-
-    @ExceptionHandler({ConstraintViolationException.class, MissingServletRequestParameterException.class,
-            MethodArgumentTypeMismatchException.class})
-    public ResponseEntity<ApiResponse<Void>> handleRequestException(Exception exception) {
-        return badRequest(exception.getMessage());
+    @ExceptionHandler({MissingServletRequestParameterException.class,
+            MethodArgumentTypeMismatchException.class,
+            HttpMessageNotReadableException.class})
+    public ResponseEntity<ApiResponse<Void>> handleBadRequest(Exception e) {
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.error(ErrorCodes.PARAM_INVALID, "请求参数格式不正确"));
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
-    public ResponseEntity<ApiResponse<Void>> handleNotFound(NoResourceFoundException exception) {
+    public ResponseEntity<ApiResponse<Void>> handleNotFound(NoResourceFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .body(ApiResponse.error(40400, "接口不存在"));
+                .body(ApiResponse.error(ErrorCodes.NOT_FOUND, "接口不存在"));
+    }
+
+    @ExceptionHandler(DuplicateKeyException.class)
+    public ResponseEntity<ApiResponse<Void>> handleDuplicateKey(DuplicateKeyException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ApiResponse.error(ErrorCodes.DUPLICATE, "数据已存在，请勿重复提交"));
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Void>> handleException(Exception exception) {
-        log.error("Unhandled request exception", exception);
+    public ResponseEntity<ApiResponse<Void>> handleUnexpected(Exception e) {
+        log.error("未处理异常", e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.error(50000, "服务器内部错误"));
-    }
-
-    private ResponseEntity<ApiResponse<Void>> badRequest(String message) {
-        return ResponseEntity.badRequest().body(ApiResponse.error(40000, message));
+                .body(ApiResponse.error(ErrorCodes.SERVER_ERROR, "服务器内部错误"));
     }
 }

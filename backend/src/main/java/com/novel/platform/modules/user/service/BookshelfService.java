@@ -1,74 +1,112 @@
 package com.novel.platform.modules.user.service;
 
+import com.novel.platform.common.api.PageParam;
+import com.novel.platform.common.api.PageResult;
+import com.novel.platform.common.auth.CurrentUser;
 import com.novel.platform.common.exception.BusinessException;
-import com.novel.platform.modules.user.dto.PageResponse;
-import com.novel.platform.modules.user.dto.ShelfItemResponse;
-import com.novel.platform.modules.user.mapper.CatalogQueryMapper;
+import com.novel.platform.common.exception.ErrorCodes;
+import com.novel.platform.modules.user.entity.UserBookshelf;
+import com.novel.platform.modules.user.mapper.NovelQueryMapper;
 import com.novel.platform.modules.user.mapper.UserBookshelfMapper;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.http.HttpStatus;
+import com.novel.platform.modules.user.model.Requests;
+import com.novel.platform.modules.user.model.Rows;
+import com.novel.platform.modules.user.model.Views;
+import com.novel.platform.utils.Ids;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 public class BookshelfService {
 
-    private final UserBookshelfMapper shelfMapper;
-    private final CatalogQueryMapper catalogMapper;
+    private final UserBookshelfMapper bookshelfMapper;
+    private final NovelQueryMapper novelQueryMapper;
 
-    public BookshelfService(UserBookshelfMapper shelfMapper, CatalogQueryMapper catalogMapper) {
-        this.shelfMapper = shelfMapper;
-        this.catalogMapper = catalogMapper;
+    public BookshelfService(UserBookshelfMapper bookshelfMapper, NovelQueryMapper novelQueryMapper) {
+        this.bookshelfMapper = bookshelfMapper;
+        this.novelQueryMapper = novelQueryMapper;
     }
 
-    public PageResponse<ShelfItemResponse> list(Long userId, int page, int pageSize) {
-        int safePage = Math.max(page, 1);
-        int safeSize = Math.min(Math.max(pageSize, 1), 100);
-        int offset = (safePage - 1) * safeSize;
-        long total = shelfMapper.countShelf(userId);
-        List<ShelfItemResponse> list = shelfMapper.selectShelfPage(userId, offset, safeSize);
-        return PageResponse.of(list, total, safePage, safeSize);
+    public PageResult<Views.BookshelfItem> list(Integer page, Integer pageSize) {
+        PageParam param = PageParam.of(page, pageSize);
+        Long userId = CurrentUser.userId();
+        long total = bookshelfMapper.countByUser(userId);
+        List<Rows.BookshelfRow> rows = bookshelfMapper.selectPage(userId, param.offset(), param.pageSize());
+        return PageResult.of(rows, total, param.page(), param.pageSize(), this::toItem);
     }
 
-    public void add(Long userId, String novelIdText) {
-        Long novelId = parseId(novelIdText, "novelId");
-        if (catalogMapper.countNovel(novelId) == 0) {
-            throw new BusinessException(40410, "小说不存在", HttpStatus.NOT_FOUND);
+    @Transactional(rollbackFor = Exception.class)
+    public void add(Requests.ShelfAdd request) {
+        Long userId = CurrentUser.userId();
+        Long novelId = Ids.parse(request.novelId(), "novelId");
+        Rows.NovelBrief novel = novelQueryMapper.selectNovel(novelId);
+        if (!isPublic(novel)) {
+            throw BusinessException.notFound(ErrorCodes.NOVEL_NOT_FOUND, "作品不存在或已下架");
         }
-        try {
-            shelfMapper.insertShelf(userId, novelId);
-        } catch (DuplicateKeyException exception) {
-            throw new BusinessException(40920, "该小说已在书架中", HttpStatus.CONFLICT);
+        if (bookshelfMapper.selectOne(userId, novelId) != null) {
+            return;
+        }
+        bookshelfMapper.insertOne(userId, novelId);
+    }
+
+    public Views.ShelfStatus status(String novelId) {
+        Long userId = CurrentUser.userId();
+        Long id = Ids.parse(novelId, "novelId");
+        UserBookshelf shelf = bookshelfMapper.selectOne(userId, id);
+        if (shelf == null) {
+            return new Views.ShelfStatus(false, null, null, null);
+        }
+        return new Views.ShelfStatus(true, shelf.getIsTop(), shelf.getIsNotify(),
+                shelf.getLastReadChapterId() == null ? null : String.valueOf(shelf.getLastReadChapterId()));
+    }
+
+    public void updateFlags(String novelId, Requests.ShelfUpdate request) {
+        Long userId = CurrentUser.userId();
+        Long id = Ids.parse(novelId, "novelId");
+        if (request.isTop() == null && request.isNotify() == null) {
+            throw BusinessException.badRequest("isTop 与 isNotify 至少提交一项");
+        }
+        int updated = bookshelfMapper.updateFlags(userId, id, request.isTop(), request.isNotify());
+        if (updated == 0) {
+            throw BusinessException.notFound(ErrorCodes.SHELF_NOT_FOUND, "书架中不存在该作品");
         }
     }
 
-    public void update(Long userId, Long novelId, Boolean isTop, Boolean isNotify) {
-        if (isTop == null && isNotify == null) {
-            throw new BusinessException(40010, "isTop 和 isNotify 至少提供一个");
+    public void updateReading(String novelId, Requests.ReadingProgress request) {
+        Long userId = CurrentUser.userId();
+        Long id = Ids.parse(novelId, "novelId");
+        Long chapterId = Ids.parse(request.chapterId(), "chapterId");
+        if (bookshelfMapper.selectOne(userId, id) == null) {
+            throw BusinessException.notFound(ErrorCodes.SHELF_NOT_FOUND, "书架中不存在该作品");
         }
-        int changed = shelfMapper.updateFlags(userId, novelId, isTop, isNotify);
-        if (changed == 0) {
-            throw new BusinessException(40411, "书架记录不存在", HttpStatus.NOT_FOUND);
+        Rows.ChapterBrief chapter = novelQueryMapper.selectChapter(chapterId);
+        if (chapter == null || !chapter.novelId.equals(id)) {
+            throw BusinessException.notFound(ErrorCodes.CHAPTER_NOT_AVAILABLE, "章节不存在或不属于该作品");
+        }
+        bookshelfMapper.updateReading(userId, id, chapterId);
+    }
+
+    public void remove(String novelId) {
+        Long userId = CurrentUser.userId();
+        Long id = Ids.parse(novelId, "novelId");
+        int deleted = bookshelfMapper.deleteOne(userId, id);
+        if (deleted == 0) {
+            throw BusinessException.notFound(ErrorCodes.SHELF_NOT_FOUND, "书架中不存在该作品");
         }
     }
 
-    public void remove(Long userId, Long novelId) {
-        int changed = shelfMapper.deleteShelf(userId, novelId);
-        if (changed == 0) {
-            throw new BusinessException(40411, "书架记录不存在", HttpStatus.NOT_FOUND);
-        }
+    private boolean isPublic(Rows.NovelBrief novel) {
+        return novel != null && novel.auditStatus != null && novel.auditStatus == 1
+                && novel.status != null && (novel.status == 0 || novel.status == 1);
     }
 
-    private Long parseId(String value, String field) {
-        try {
-            long id = Long.parseLong(value.trim());
-            if (id <= 0) {
-                throw new NumberFormatException();
-            }
-            return id;
-        } catch (Exception exception) {
-            throw new BusinessException(40000, field + ": ID 格式不正确");
-        }
+    private Views.BookshelfItem toItem(Rows.BookshelfRow row) {
+        return new Views.BookshelfItem(
+                String.valueOf(row.novelId), row.title, row.coverUrl, row.status, row.totalWords,
+                row.latestChapterId == null ? null : String.valueOf(row.latestChapterId),
+                row.latestChapterTitle,
+                row.lastReadChapterId == null ? null : String.valueOf(row.lastReadChapterId),
+                row.lastReadTitle, row.lastReadAt, row.isTop, row.isNotify, row.updatedAt);
     }
 }

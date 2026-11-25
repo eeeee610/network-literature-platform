@@ -1,18 +1,21 @@
 package com.novel.platform.modules.user.service;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.novel.platform.common.api.PageParam;
+import com.novel.platform.common.api.PageResult;
+import com.novel.platform.common.auth.CurrentUser;
+import com.novel.platform.common.auth.JwtUtil;
 import com.novel.platform.common.exception.BusinessException;
-import com.novel.platform.modules.user.dto.AuthResponse;
-import com.novel.platform.modules.user.dto.LoginRequest;
-import com.novel.platform.modules.user.dto.RegisterRequest;
-import com.novel.platform.modules.user.dto.UserProfile;
+import com.novel.platform.common.exception.ErrorCodes;
 import com.novel.platform.modules.user.entity.AppUser;
 import com.novel.platform.modules.user.entity.UserAccount;
 import com.novel.platform.modules.user.mapper.AppUserMapper;
 import com.novel.platform.modules.user.mapper.UserAccountMapper;
-import com.novel.platform.modules.user.security.JwtService;
-import com.novel.platform.modules.user.security.PasswordHasher;
+import com.novel.platform.modules.user.model.Requests;
+import com.novel.platform.modules.user.model.Views;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,101 +25,90 @@ import java.time.LocalDateTime;
 @Service
 public class AuthService {
 
-    private final AppUserMapper userMapper;
-    private final UserAccountMapper accountMapper;
-    private final PasswordHasher passwordHasher;
-    private final JwtService jwtService;
+    private final AppUserMapper appUserMapper;
+    private final UserAccountMapper userAccountMapper;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
-    public AuthService(AppUserMapper userMapper, UserAccountMapper accountMapper,
-                       PasswordHasher passwordHasher, JwtService jwtService) {
-        this.userMapper = userMapper;
-        this.accountMapper = accountMapper;
-        this.passwordHasher = passwordHasher;
-        this.jwtService = jwtService;
+    public AuthService(AppUserMapper appUserMapper, UserAccountMapper userAccountMapper,
+                       PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+        this.appUserMapper = appUserMapper;
+        this.userAccountMapper = userAccountMapper;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
-    @Transactional
-    public AuthResponse register(RegisterRequest request) {
+    @Transactional(rollbackFor = Exception.class)
+    public Views.RegisterResult register(Requests.Register request) {
         String username = request.username().trim();
-        String email = blankToNull(request.email());
-        String phone = blankToNull(request.phone());
-        String nickname = blankToNull(request.nickname());
-        if (nickname == null) {
-            nickname = username;
-        }
-
-        if (userMapper.selectCount(Wrappers.<AppUser>lambdaQuery().eq(AppUser::getUsername, username)) > 0) {
-            throw new BusinessException(40910, "用户名已存在", HttpStatus.CONFLICT);
-        }
-        if (email != null && userMapper.selectCount(
-                Wrappers.<AppUser>lambdaQuery().eq(AppUser::getEmail, email)) > 0) {
-            throw new BusinessException(40911, "邮箱已被使用", HttpStatus.CONFLICT);
-        }
-        if (phone != null && userMapper.selectCount(
-                Wrappers.<AppUser>lambdaQuery().eq(AppUser::getPhone, phone)) > 0) {
-            throw new BusinessException(40912, "手机号已被使用", HttpStatus.CONFLICT);
+        Long exists = appUserMapper.selectCount(Wrappers.<AppUser>lambdaQuery()
+                .eq(AppUser::getUsername, username));
+        if (exists != null && exists > 0) {
+            throw BusinessException.conflict(ErrorCodes.DUPLICATE, "用户名已被注册");
         }
 
         AppUser user = new AppUser();
         user.setUsername(username);
-        user.setPasswordHash(passwordHasher.encode(request.password()));
-        user.setEmail(email);
-        user.setPhone(phone);
-        user.setNickname(nickname);
+        user.setPasswordHash(passwordEncoder.encode(request.password()));
+        user.setNickname(isBlank(request.nickname()) ? username : request.nickname().trim());
+        user.setEmail(isBlank(request.email()) ? null : request.email().trim());
+        user.setPhone(isBlank(request.phone()) ? null : request.phone().trim());
         user.setRole("READER");
         user.setStatus("ACTIVE");
-        userMapper.insert(user);
+        appUserMapper.insert(user);
 
         UserAccount account = new UserAccount();
         account.setUserId(user.getUserId());
-        account.setBalance(BigDecimal.ZERO);
-        accountMapper.insert(account);
+        account.setBalance(new BigDecimal("0.00"));
+        userAccountMapper.insert(account);
 
-        return issue(user);
+        return new Views.RegisterResult(String.valueOf(user.getUserId()), user.getUsername(),
+                user.getNickname(), user.getRole());
     }
 
-    public AuthResponse login(LoginRequest request) {
-        String accountName = request.account().trim();
-        AppUser user = userMapper.findByAccount(accountName);
-        if (user == null || !passwordHasher.matches(request.password(), user.getPasswordHash())) {
-            throw new BusinessException(40101, "账号或密码错误", HttpStatus.UNAUTHORIZED);
+    public Views.LoginResult login(Requests.Login request) {
+        AppUser user = appUserMapper.selectOne(Wrappers.<AppUser>lambdaQuery()
+                .eq(AppUser::getUsername, request.username().trim()));
+        if (user == null || !passwordEncoder.matches(request.password(), user.getPasswordHash())) {
+            throw new BusinessException(ErrorCodes.LOGIN_FAILED, HttpStatus.UNAUTHORIZED, "用户名或密码错误");
         }
         if (!"ACTIVE".equals(user.getStatus())) {
-            throw new BusinessException(40301, "账号已被锁定或禁用", HttpStatus.FORBIDDEN);
+            throw BusinessException.forbidden("账号已被锁定或禁用");
         }
-        userMapper.updateLastLogin(user.getUserId(), LocalDateTime.now());
-        return issue(user);
+
+        user.setLastLoginAt(LocalDateTime.now());
+        appUserMapper.updateById(user);
+
+        String token = jwtUtil.generate(user.getUserId(), user.getUsername(), user.getRole());
+        return new Views.LoginResult(token, "Bearer", jwtUtil.expiresInSeconds(), toUserInfo(user));
     }
 
-    public UserProfile me(Long userId) {
-        AppUser user = userMapper.selectById(userId);
-        if (user == null) {
-            throw new BusinessException(40100, "用户不存在或登录已失效", HttpStatus.UNAUTHORIZED);
+    public Views.UserInfo me() {
+        AppUser user = appUserMapper.selectById(CurrentUser.userId());
+        if (user == null || !"ACTIVE".equals(user.getStatus())) {
+            throw BusinessException.unauthorized("未登录或登录已失效");
         }
-        return profile(user);
+        return toUserInfo(user);
     }
 
-    private AuthResponse issue(AppUser user) {
-        String token = jwtService.createToken(user.getUserId(), user.getUsername(), user.getRole());
-        return new AuthResponse(token, "Bearer", jwtService.expiresInSeconds(), profile(user));
+    public PageResult<Views.AdminUserItem> adminUsers(Integer page, Integer pageSize, String keyword) {
+        PageParam param = PageParam.of(page, pageSize);
+        String kw = isBlank(keyword) ? null : keyword.trim();
+        Page<AppUser> result = appUserMapper.selectPage(new Page<>(param.page(), param.pageSize()),
+                Wrappers.<AppUser>lambdaQuery()
+                        .and(kw != null, w -> w.like(AppUser::getUsername, kw).or().like(AppUser::getNickname, kw))
+                        .orderByDesc(AppUser::getCreatedAt));
+        return PageResult.of(result.getRecords(), result.getTotal(), param.page(), param.pageSize(),
+                u -> new Views.AdminUserItem(String.valueOf(u.getUserId()), u.getUsername(), u.getNickname(),
+                        u.getEmail(), u.getRole(), u.getStatus(), u.getCreatedAt()));
     }
 
-    private UserProfile profile(AppUser user) {
-        return new UserProfile(
-                String.valueOf(user.getUserId()),
-                user.getUsername(),
-                user.getNickname(),
-                user.getAvatarUrl(),
-                user.getRole(),
-                user.getStatus()
-        );
+    private Views.UserInfo toUserInfo(AppUser user) {
+        return new Views.UserInfo(String.valueOf(user.getUserId()), user.getUsername(),
+                user.getNickname(), user.getAvatarUrl(), user.getRole());
     }
 
-    private String blankToNull(String value) {
-        if (value == null) {
-            return null;
-        }
-        String trimmed = value.trim();
-        return trimmed.isEmpty() ? null : trimmed;
+    private boolean isBlank(String value) {
+        return value == null || value.isBlank();
     }
 }
