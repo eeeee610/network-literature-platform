@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.novel.platform.modules.admin.mapper.AdminUserMapper">
+
+    <sql id="userFilter">
+        <where>
+            <if test="keyword != null and keyword != ''">
+                AND (u.username LIKE CONCAT('%', #{keyword}, '%')
+                     OR u.nickname LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+            <if test="role != null">AND u.role = #{role}</if>
+            <if test="status != null">AND u.status = #{status}</if>
+        </where>
+    </sql>
+
+    <select id="selectUsers" resultType="com.novel.platform.modules.admin.dto.AdminUserRow">
+        SELECT u.user_id, u.username, u.nickname, u.avatar_url, u.email, u.phone,
+               u.role, u.status, u.last_login_at, u.created_at
+        FROM app_user u
+        <include refid="userFilter" />
+        ORDER BY u.created_at DESC, u.user_id DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countUsers" resultType="long">
+        SELECT COUNT(*) FROM app_user u
+        <include refid="userFilter" />
+    </select>
+
+    <select id="selectUserById" resultType="com.novel.platform.modules.admin.dto.AdminUserRow">
+        SELECT u.user_id, u.username, u.nickname, u.avatar_url, u.email, u.phone,
+               u.role, u.status, u.last_login_at, u.created_at
+        FROM app_user u
+        WHERE u.user_id = #{userId}
+    </select>
+
+    <update id="updateStatus">
+        UPDATE app_user SET status = #{status} WHERE user_id = #{userId}
+    </update>
+</mapper>

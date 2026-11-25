@@ -1,15 +1,24 @@
 package com.novel.platform.modules.admin.dto;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public record DashboardSummaryResponse(
         String dataSource,
-        List<Metric> metrics,
-        List<AuditItem> pendingAudits
+        long userCount,
+        long novelCount,
+        long commentCount,
+        long subscriptionCount,
+        BigDecimal subscriptionAmount,
+        long tipCount,
+        BigDecimal tipAmount,
+        PendingAuditCounts pendingCounts,
+        List<AuditItem> recentPendingAudits
 ) {
-    public record Metric(String key, String label, long value, String unit) {
+    public record PendingAuditCounts(long novel, long chapter, long comment, long rating) {
     }
 
-    public record AuditItem(String id, String type, String title, String author, String submittedAt) {
+    public record AuditItem(String id, String type, String title, String author, LocalDateTime submittedAt) {
     }
 }

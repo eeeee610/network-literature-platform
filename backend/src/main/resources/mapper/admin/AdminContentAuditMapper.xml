@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.novel.platform.modules.admin.mapper.AdminContentAuditMapper">
+
+    <sql id="novelFilter">
+        <where>
+            <if test="auditStatus != null">AND n.audit_status = #{auditStatus}</if>
+            <if test="keyword != null and keyword != ''">
+                AND n.title LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+            <if test="author != null and author != ''">
+                AND (u.nickname LIKE CONCAT('%', #{author}, '%')
+                     OR u.username LIKE CONCAT('%', #{author}, '%'))
+            </if>
+        </where>
+    </sql>
+
+    <select id="selectNovels" resultType="com.novel.platform.modules.admin.dto.NovelAuditRow">
+        SELECT n.novel_id, n.author_id, n.title, u.nickname AS author_name,
+               n.cover_url, n.description, n.status, n.audit_status, n.total_words,
+               n.created_at, n.updated_at
+        FROM novel n
+        JOIN app_user u ON u.user_id = n.author_id
+        <include refid="novelFilter" />
+        ORDER BY n.updated_at DESC, n.novel_id DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countNovels" resultType="long">
+        SELECT COUNT(*)
+        FROM novel n
+        JOIN app_user u ON u.user_id = n.author_id
+        <include refid="novelFilter" />
+    </select>
+
+    <sql id="chapterFilter">
+        <where>
+            <if test="novelId != null">AND c.novel_id = #{novelId}</if>
+            <if test="auditStatus != null">AND c.audit_status = #{auditStatus}</if>
+            <if test="keyword != null and keyword != ''">
+                AND c.title LIKE CONCAT('%', #{keyword}, '%')
+            </if>
+        </where>
+    </sql>
+
+    <select id="selectChapters" resultType="com.novel.platform.modules.admin.dto.ChapterAuditRow">
+        SELECT c.chapter_id, c.novel_id, n.title AS novel_title, u.nickname AS author_name,
+               c.chapter_no, c.title, c.word_count, c.is_vip, c.status, c.audit_status,
+               c.created_at, c.updated_at
+        FROM chapter c
+        JOIN novel n ON n.novel_id = c.novel_id
+        JOIN app_user u ON u.user_id = n.author_id
+        <include refid="chapterFilter" />
+        ORDER BY c.updated_at DESC, c.chapter_id DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countChapters" resultType="long">
+        SELECT COUNT(*)
+        FROM chapter c
+        <include refid="chapterFilter" />
+    </select>
+
+    <select id="selectChapterDetail" resultType="com.novel.platform.modules.admin.dto.ChapterAuditRow">
+        SELECT c.chapter_id, c.novel_id, n.title AS novel_title, u.nickname AS author_name,
+               c.chapter_no, c.title, c.content, c.word_count, c.is_vip,
+               c.status, c.audit_status, c.created_at, c.updated_at
+        FROM chapter c
+        JOIN novel n ON n.novel_id = c.novel_id
+        JOIN app_user u ON u.user_id = n.author_id
+        WHERE c.chapter_id = #{chapterId}
+    </select>
+
+    <select id="countNovelById" resultType="int">
+        SELECT COUNT(*) FROM novel WHERE novel_id = #{novelId}
+    </select>
+
+    <select id="countChapterById" resultType="int">
+        SELECT COUNT(*) FROM chapter WHERE chapter_id = #{chapterId}
+    </select>
+
+    <update id="updateNovelAuditStatus">
+        UPDATE novel SET audit_status = #{auditStatus} WHERE novel_id = #{novelId}
+    </update>
+
+    <update id="updateChapterAuditStatus">
+        UPDATE chapter SET audit_status = #{auditStatus} WHERE chapter_id = #{chapterId}
+    </update>
+
+    <sql id="auditLogFilter">
+        <where>
+            <if test="targetType != null">AND l.target_type = #{targetType}</if>
+            <if test="targetId != null">AND l.target_id = #{targetId}</if>
+            <if test="adminId != null">AND l.admin_id = #{adminId}</if>
+            <if test="startTime != null">AND l.created_at &gt;= #{startTime}</if>
+            <if test="endTime != null">AND l.created_at &lt;= #{endTime}</if>
+        </where>
+    </sql>
+
+    <select id="selectAuditLogs" resultType="com.novel.platform.modules.admin.dto.AuditLogRow">
+        SELECT l.audit_id, l.admin_id, u.nickname AS admin_name,
+               l.target_type, l.target_id, l.audit_action, l.audit_reason, l.created_at
+        FROM audit_log l
+        JOIN app_user u ON u.user_id = l.admin_id
+        <include refid="auditLogFilter" />
+        ORDER BY l.created_at DESC, l.audit_id DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countAuditLogs" resultType="long">
+        SELECT COUNT(*) FROM audit_log l
+        <include refid="auditLogFilter" />
+    </select>
+</mapper>

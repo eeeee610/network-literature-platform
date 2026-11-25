@@ -10,9 +10,8 @@ import org.springframework.web.servlet.HandlerInterceptor;
 /**
  * JWT 鉴权拦截器。
  * <p>
- * 公开接口：登录、榜单查询、评论与评分只读查询、后台统计 Mock 接口。
- * 需要登录：评论/评分的写操作。需要管理员：/api/admin/** 下的评论审核、
- * 评分短评审核与榜单配置/生成接口。
+ * 公开接口：登录、榜单查询、评论与评分只读查询。
+ * 需要登录：评论/评分的写操作；/api/admin/** 全部要求管理员身份。
  */
 @Component
 public class AuthInterceptor implements HandlerInterceptor {
@@ -74,9 +73,6 @@ public class AuthInterceptor implements HandlerInterceptor {
 
     private boolean isPublic(String path, String method) {
         if ("POST".equalsIgnoreCase(method) && "/api/user/auth/login".equals(path)) {
-            return true;
-        }
-        if (path.startsWith("/api/admin/dashboard")) {
             return true;
         }
         if (path.startsWith("/api/interaction/ranking")) {
