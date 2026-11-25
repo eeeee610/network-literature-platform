@@ -1,42 +1,20 @@
 <script setup>
-import { provide, ref } from 'vue'
+import { computed } from 'vue'
 import { RouterLink, RouterView } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import {
-  clearNovelToken,
-  getNovelToken,
-  setNovelToken,
-} from '@/api/novel'
+import { currentUser, isLoggedIn, logout } from '@/api/auth'
 
-const token = ref(getNovelToken())
-const dialogVisible = ref(false)
-const tokenInput = ref('')
+const loggedIn = computed(() => isLoggedIn())
+const viewer = computed(() => currentUser())
 
-function openTokenDialog() {
-  tokenInput.value = token.value
-  dialogVisible.value = true
-}
-
-function saveToken() {
-  const value = tokenInput.value.trim()
-  if (value) {
-    setNovelToken(value)
-    token.value = value
-    ElMessage.success('令牌已保存')
-  } else {
-    clearNovelToken()
-    token.value = ''
-    ElMessage.info('已清除本地令牌')
+async function handleLogout() {
+  try {
+    await logout()
+    ElMessage.success('已退出登录')
+  } finally {
+    window.location.href = '/rankings'
   }
-  dialogVisible.value = false
 }
-
-function clearInput() {
-  tokenInput.value = ''
-}
-
-provide('novelToken', token)
-provide('openNovelTokenDialog', openTokenDialog)
 </script>
 
 <template>
@@ -57,9 +35,14 @@ provide('openNovelTokenDialog', openTokenDialog)
         </nav>
 
         <div class="header-actions">
-          <el-tag v-if="token" type="success" effect="plain" size="small">已配置令牌</el-tag>
-          <el-tag v-else type="info" effect="plain" size="small">未配置令牌</el-tag>
-          <el-button size="small" @click="openTokenDialog">令牌</el-button>
+          <template v-if="loggedIn">
+            <RouterLink to="/account" class="user-link">{{ viewer?.nickname || viewer?.username || '我的书院' }}</RouterLink>
+            <el-button size="small" @click="handleLogout">退出</el-button>
+          </template>
+          <template v-else>
+            <RouterLink to="/login"><el-button size="small">登录</el-button></RouterLink>
+            <RouterLink to="/register"><el-button size="small" type="primary">注册</el-button></RouterLink>
+          </template>
         </div>
       </div>
     </header>
@@ -69,29 +52,9 @@ provide('openNovelTokenDialog', openTokenDialog)
     </main>
 
     <footer class="site-footer">
-      <span>B 作品与内容模块 · 接口联调演示</span>
-      <span>数据来自 /api/novel</span>
+      <span>网络文学创作与阅读平台</span>
+      <span>以书评为楼层，让每一次阅读留下回响</span>
     </footer>
-
-    <el-dialog v-model="dialogVisible" title="设置访问令牌" width="460px" append-to-body>
-      <p class="token-hint">临时：联调时替换为 A 的登录</p>
-      <el-input
-        v-model="tokenInput"
-        type="textarea"
-        :rows="3"
-        resize="none"
-        placeholder="粘贴 A 模块登录后返回的 JWT"
-      />
-      <p class="token-note">
-        令牌仅保存在本机 localStorage（键名 novel_token），用于作者接口的
-        Authorization 请求头。
-      </p>
-      <template #footer>
-        <el-button text @click="clearInput">清空输入</el-button>
-        <el-button @click="dialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="saveToken">保存</el-button>
-      </template>
-    </el-dialog>
   </div>
 </template>
 
@@ -213,22 +176,15 @@ provide('openNovelTokenDialog', openTokenDialog)
   border-top: 1px solid var(--line);
 }
 
-.token-hint {
-  margin-bottom: 12px;
-  padding: 9px 12px;
-  color: #8a611f;
-  font-size: 12px;
-  line-height: 1.6;
-  background: #fdf6e8;
-  border-left: 3px solid var(--gold);
-  border-radius: 4px;
+.user-link {
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
 }
 
-.token-note {
-  margin: 10px 0 0;
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.7;
+.user-link:hover {
+  text-decoration: underline;
 }
 
 @media (max-width: 720px) {

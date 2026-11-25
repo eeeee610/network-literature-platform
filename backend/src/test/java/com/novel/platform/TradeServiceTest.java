@@ -1,6 +1,7 @@
 package com.novel.platform;
 
 import com.novel.platform.common.exception.BusinessException;
+import com.novel.platform.modules.novel.service.NovelVisibilityService;
 import com.novel.platform.modules.user.dto.SubscribeParam;
 import com.novel.platform.modules.user.dto.SubscribeRequest;
 import com.novel.platform.modules.user.dto.SubscribeResponse;
@@ -37,6 +38,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -50,6 +52,8 @@ class TradeServiceTest {
     private UserAccountMapper accountMapper;
     @Mock
     private TradeProcRepository procRepository;
+    @Mock
+    private NovelVisibilityService visibilityService;
     @InjectMocks
     private TradeService tradeService;
 
@@ -64,7 +68,8 @@ class TradeServiceTest {
             return null;
         }).when(procRepository).subscribe(any(SubscribeParam.class));
         when(tradeMapper.selectSubscription(101L, 501L))
-                .thenReturn(subscriptionItem("ACTIVE", new BigDecimal("12.50"), null));
+                .thenReturn(null, subscriptionItem("ACTIVE", new BigDecimal("12.50"), null));
+        when(visibilityService.isPublicChapter(501L)).thenReturn(true);
 
         SubscribeResponse response = tradeService.subscribe(new SubscribeRequest("501", "SUB-test-1"));
 
@@ -89,7 +94,8 @@ class TradeServiceTest {
             return null;
         }).when(procRepository).subscribe(any(SubscribeParam.class));
         when(tradeMapper.selectSubscription(101L, 501L))
-                .thenReturn(subscriptionItem("ACTIVE", new BigDecimal("12.50"), null));
+                .thenReturn(null, subscriptionItem("ACTIVE", new BigDecimal("12.50"), null));
+        when(visibilityService.isPublicChapter(501L)).thenReturn(true);
 
         SubscribeResponse response = tradeService.subscribe(new SubscribeRequest("501", "SUB-test-1"));
 
@@ -154,6 +160,7 @@ class TradeServiceTest {
     void shouldTipResolvedAuthorThroughProcedure() {
         when(userService.requireActiveUser()).thenReturn(activeUser());
         when(tradeMapper.selectNovelAuthorId(301L)).thenReturn(202L);
+        when(visibilityService.isPublicNovel(301L)).thenReturn(true);
         doAnswer(invocation -> {
             TipParam param = invocation.getArgument(0);
             param.setResultCode("SUCCESS");
@@ -181,6 +188,7 @@ class TradeServiceTest {
     void shouldReturnOriginalTipForDuplicateRequest() {
         when(userService.requireActiveUser()).thenReturn(activeUser());
         when(tradeMapper.selectNovelAuthorId(301L)).thenReturn(202L);
+        when(visibilityService.isPublicNovel(301L)).thenReturn(true);
         doAnswer(invocation -> {
             TipParam param = invocation.getArgument(0);
             param.setResultCode("DUPLICATE_REQUEST");
@@ -201,10 +209,8 @@ class TradeServiceTest {
     }
 
     @Test
-    void shouldRejectDuplicateKeyWithDifferentTipParameters() {
+    void shouldRejectDuplicateRequestWithDifferentTipParameters() {
         when(userService.requireActiveUser()).thenReturn(activeUser());
-        when(tradeMapper.selectNovelAuthorId(301L)).thenReturn(202L);
-        doThrow(new DuplicateKeyException("duplicate")).when(procRepository).tip(any(TipParam.class));
         when(tradeMapper.selectTipByRequestNo(101L, "TIP-test-1")).thenReturn(tipItem("501"));
 
         BusinessException exception = assertThrows(BusinessException.class, () -> tradeService.tip(
@@ -212,6 +218,46 @@ class TradeServiceTest {
 
         assertEquals(41006, exception.getCode());
         verify(accountMapper, never()).updateById(any(UserAccount.class));
+    }
+
+    @Test
+    void shouldRejectSubscribeWhenChapterNotPublic() {
+        when(userService.requireActiveUser()).thenReturn(activeUser());
+        when(visibilityService.isPublicChapter(501L)).thenReturn(false);
+
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> tradeService.subscribe(new SubscribeRequest("501", "SUB-test-draft")));
+
+        assertEquals(41004, exception.getCode());
+        verify(procRepository, never()).subscribe(any(SubscribeParam.class));
+        verify(tradeMapper, never()).insert(any(AccountTransaction.class));
+    }
+
+    @Test
+    void shouldRejectTipWhenNovelNotPublic() {
+        when(userService.requireActiveUser()).thenReturn(activeUser());
+        when(tradeMapper.selectNovelAuthorId(301L)).thenReturn(202L);
+        when(visibilityService.isPublicNovel(301L)).thenReturn(false);
+
+        BusinessException exception = assertThrows(BusinessException.class, () -> tradeService.tip(
+                new TipRequest("301", "501", new BigDecimal("19.00"), "审核中作品", "TIP-test-audit")));
+
+        assertEquals(41004, exception.getCode());
+        verify(procRepository, never()).tip(any(TipParam.class));
+        verify(tradeMapper, never()).insert(any(AccountTransaction.class));
+    }
+
+    @Test
+    void shouldRejectTipWhenNovelMissing() {
+        when(userService.requireActiveUser()).thenReturn(activeUser());
+        when(tradeMapper.selectNovelAuthorId(301L)).thenReturn(null);
+
+        BusinessException exception = assertThrows(BusinessException.class, () -> tradeService.tip(
+                new TipRequest("301", null, new BigDecimal("19.00"), null, "TIP-test-missing")));
+
+        assertEquals(41004, exception.getCode());
+        verify(procRepository, never()).tip(any(TipParam.class));
+        verify(visibilityService, never()).isPublicNovel(301L);
     }
 
     private AppUser activeUser() {

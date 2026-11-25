@@ -1,6 +1,7 @@
 package com.novel.platform.modules.novel.service;
 
 import com.novel.platform.common.exception.BusinessException;
+import com.novel.platform.common.security.UserContext;
 import com.novel.platform.modules.novel.dto.ChapterCatalogItem;
 import com.novel.platform.modules.novel.dto.ChapterCatalogResponse;
 import com.novel.platform.modules.novel.dto.ChapterReadResponse;
@@ -17,6 +18,7 @@ import com.novel.platform.modules.novel.mapper.ChapterMapper;
 import com.novel.platform.modules.novel.mapper.NovelMapper;
 import com.novel.platform.modules.novel.mapper.NovelTagMapper;
 import com.novel.platform.modules.novel.mapper.TagMapper;
+import com.novel.platform.modules.user.service.ChapterEntitlementService;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -38,15 +40,18 @@ public class NovelQueryService {
     private final ChapterMapper chapterMapper;
     private final TagMapper tagMapper;
     private final NovelTagMapper novelTagMapper;
+    private final ChapterEntitlementService entitlementService;
 
     public NovelQueryService(NovelMapper novelMapper,
                              ChapterMapper chapterMapper,
                              TagMapper tagMapper,
-                             NovelTagMapper novelTagMapper) {
+                             NovelTagMapper novelTagMapper,
+                             ChapterEntitlementService entitlementService) {
         this.novelMapper = novelMapper;
         this.chapterMapper = chapterMapper;
         this.tagMapper = tagMapper;
         this.novelTagMapper = novelTagMapper;
+        this.entitlementService = entitlementService;
     }
 
     public PageResult<NovelListItem> listPublic(Integer pageRaw, Integer pageSizeRaw, String sortRaw,
@@ -162,6 +167,8 @@ public class NovelQueryService {
         if (row == null) {
             throw new BusinessException(40903, "章节不存在", HttpStatus.NOT_FOUND);
         }
+        boolean canRead = !Integer.valueOf(1).equals(row.getIsVip())
+                || entitlementService.hasActiveSubscription(UserContext.currentUserId(), chapterId);
         ChapterRow prev = chapterMapper.selectPrevChapter(row.getNovelId(), row.getChapterNo());
         ChapterRow next = chapterMapper.selectNextChapter(row.getNovelId(), row.getChapterNo());
         return new ChapterReadResponse(
@@ -170,7 +177,8 @@ public class NovelQueryService {
                 row.getNovelTitle(),
                 row.getChapterNo(),
                 row.getTitle(),
-                row.getContent(),
+                canRead ? row.getContent() : null,
+                canRead,
                 row.getIsVip(),
                 row.getVipPrice(),
                 row.getWordCount(),

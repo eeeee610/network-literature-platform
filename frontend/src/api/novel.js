@@ -1,27 +1,5 @@
 import request from './request'
 
-export const TOKEN_KEY = 'novel_token'
-
-request.interceptors.request.use((config) => {
-  const token = getNovelToken()
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
-  return config
-})
-
-export function getNovelToken() {
-  return localStorage.getItem(TOKEN_KEY) || ''
-}
-
-export function setNovelToken(token) {
-  localStorage.setItem(TOKEN_KEY, token)
-}
-
-export function clearNovelToken() {
-  localStorage.removeItem(TOKEN_KEY)
-}
-
 export function getErrorCode(error) {
   return error?.response?.data?.code ?? null
 }

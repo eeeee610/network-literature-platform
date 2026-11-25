@@ -6,6 +6,7 @@ import {
   getErrorMessage,
   getNovelChapters,
 } from '@/api/novel'
+import { isLoggedIn } from '@/api/auth'
 
 const route = useRoute()
 const router = useRouter()
@@ -36,6 +37,14 @@ const vipBlocked = computed(() =>
 const detailLink = computed(() =>
   chapter.value?.novelId ? `/novel/${chapter.value.novelId}` : '/bookstore',
 )
+const loggedIn = isLoggedIn()
+const vipLocked = computed(
+  () => chapter.value?.isVip === 1 && chapter.value?.canRead === false,
+)
+
+function goLogin() {
+  router.push({ path: '/login', query: { redirect: route.fullPath } })
+}
 
 function formatTime(value) {
   return value ? String(value).replace('T', ' ').slice(0, 16) : '—'
@@ -176,10 +185,25 @@ watch(
         </template>
       </el-alert>
 
-      <div v-if="paragraphs.length" class="chapter-content">
-        <p v-for="(paragraph, index) in paragraphs" :key="index">{{ paragraph }}</p>
-      </div>
-      <el-empty v-else description="本章暂无正文内容" />
+      <template v-if="vipLocked">
+        <div class="vip-locked">
+          <el-empty description="本章为 VIP 章节，订阅后可阅读全文" />
+          <p class="state-note">
+            本章定价 ¥{{ formatPrice(chapter.vipPrice) }}，订阅与扣费由 A 模块负责。登录并完成订阅后即可阅读正文。
+          </p>
+          <div class="state-actions">
+            <el-button v-if="!loggedIn" type="primary" @click="goLogin">登录后订阅</el-button>
+            <el-button v-else type="primary" @click="router.push('/account')">去书院订阅</el-button>
+            <el-button @click="router.push(detailLink)">返回作品详情</el-button>
+          </div>
+        </div>
+      </template>
+      <template v-else>
+        <div v-if="paragraphs.length" class="chapter-content">
+          <p v-for="(paragraph, index) in paragraphs" :key="index">{{ paragraph }}</p>
+        </div>
+        <el-empty v-else description="本章暂无正文内容" />
+      </template>
 
       <footer class="chapter-foot">
         <el-button :disabled="!chapter.prevChapterId" @click="goTo(chapter.prevChapterId)">
@@ -306,6 +330,11 @@ watch(
 
 .vip-notice {
   margin-top: 20px;
+}
+
+.vip-locked {
+  text-align: center;
+  padding: 18px 0 8px;
 }
 
 .chapter-content {

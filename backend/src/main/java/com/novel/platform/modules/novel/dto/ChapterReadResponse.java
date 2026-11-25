@@ -9,6 +9,7 @@ public record ChapterReadResponse(
         Integer chapterNo,
         String title,
         String content,
+        boolean canRead,
         Integer isVip,
         BigDecimal vipPrice,
         Integer wordCount,

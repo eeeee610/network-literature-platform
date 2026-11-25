@@ -2,6 +2,7 @@ package com.novel.platform.modules.user.service;
 
 import com.novel.platform.common.api.PageResult;
 import com.novel.platform.common.exception.BusinessException;
+import com.novel.platform.modules.novel.service.NovelVisibilityService;
 import com.novel.platform.modules.user.dto.SubscribeParam;
 import com.novel.platform.modules.user.dto.SubscribeRequest;
 import com.novel.platform.modules.user.dto.SubscribeResponse;
@@ -32,22 +33,36 @@ public class TradeService {
     private final UserTradeMapper tradeMapper;
     private final UserAccountMapper accountMapper;
     private final TradeProcRepository procRepository;
+    private final NovelVisibilityService visibilityService;
 
     public TradeService(UserService userService, UserTradeMapper tradeMapper,
-                        UserAccountMapper accountMapper, TradeProcRepository procRepository) {
+                        UserAccountMapper accountMapper, TradeProcRepository procRepository,
+                        NovelVisibilityService visibilityService) {
         this.userService = userService;
         this.tradeMapper = tradeMapper;
         this.accountMapper = accountMapper;
         this.procRepository = procRepository;
+        this.visibilityService = visibilityService;
     }
 
     public SubscribeResponse subscribe(SubscribeRequest request) {
         AppUser user = userService.requireActiveUser();
         long chapterId = UserSupport.id(request.chapterId(), "chapterId");
+        String requestNo = request.requestNo().trim();
+        if (tradeMapper.selectSubscriptionByRequestNo(user.getUserId(), requestNo) != null) {
+            return duplicateSubscription(user.getUserId(), chapterId, requestNo);
+        }
+        SubscriptionItem existing = tradeMapper.selectSubscription(user.getUserId(), chapterId);
+        if (existing != null) {
+            return alreadySubscribed(user.getUserId(), existing);
+        }
+        if (!visibilityService.isPublicChapter(chapterId)) {
+            throw new BusinessException(41004, "作品或章节不存在或未公开", HttpStatus.NOT_FOUND);
+        }
         SubscribeParam param = new SubscribeParam();
         param.setUserId(user.getUserId());
         param.setChapterId(chapterId);
-        param.setRequestNo(request.requestNo().trim());
+        param.setRequestNo(requestNo);
         try {
             procRepository.subscribe(param);
         } catch (DuplicateKeyException exception) {
@@ -117,9 +132,13 @@ public class TradeService {
         AppUser user = userService.requireActiveUser();
         long novelId = UserSupport.id(request.novelId(), "novelId");
         Long chapterId = UserSupport.nullableId(request.chapterId(), "chapterId");
+        String requestNo = request.requestNo().trim();
+        if (tradeMapper.selectTipByRequestNo(user.getUserId(), requestNo) != null) {
+            return duplicateTip(user.getUserId(), novelId, chapterId, request.amount(), requestNo);
+        }
         Long authorId = tradeMapper.selectNovelAuthorId(novelId);
-        if (authorId == null) {
-            throw new BusinessException(41004, "作品不存在", HttpStatus.NOT_FOUND);
+        if (authorId == null || !visibilityService.isPublicNovel(novelId)) {
+            throw new BusinessException(41004, "作品不存在或未公开", HttpStatus.NOT_FOUND);
         }
 
         TipParam param = new TipParam();
@@ -129,7 +148,7 @@ public class TradeService {
         param.setChapterId(chapterId);
         param.setAmount(request.amount());
         param.setMessage(request.message() == null ? "" : request.message().trim());
-        param.setRequestNo(request.requestNo().trim());
+        param.setRequestNo(requestNo);
         try {
             procRepository.tip(param);
         } catch (DuplicateKeyException exception) {
@@ -162,6 +181,10 @@ public class TradeService {
         if (existing == null || !String.valueOf(chapterId).equals(existing.chapterId())) {
             throw new BusinessException(41006, "同一请求号的参数与已有订阅不一致", HttpStatus.CONFLICT);
         }
+        return alreadySubscribed(userId, existing);
+    }
+
+    private SubscribeResponse alreadySubscribed(Long userId, SubscriptionItem existing) {
         UserAccount account = accountMapper.selectById(userId);
         return new SubscribeResponse(existing.chapterId(), "ALREADY_SUBSCRIBED", existing.txnNo(),
                 existing.paidAmount(), account.getBalance(), true);

@@ -1,6 +1,8 @@
 package com.novel.platform.common.security;
 
 import com.novel.platform.common.exception.BusinessException;
+import com.novel.platform.modules.user.entity.AppUser;
+import com.novel.platform.modules.user.mapper.AppUserMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
@@ -19,9 +21,11 @@ public class AuthInterceptor implements HandlerInterceptor {
     private static final String BEARER_PREFIX = "Bearer ";
 
     private final JwtTokenProvider tokenProvider;
+    private final AppUserMapper userMapper;
 
-    public AuthInterceptor(JwtTokenProvider tokenProvider) {
+    public AuthInterceptor(JwtTokenProvider tokenProvider, AppUserMapper userMapper) {
         this.tokenProvider = tokenProvider;
+        this.userMapper = userMapper;
     }
 
     @Override
@@ -64,11 +68,20 @@ public class AuthInterceptor implements HandlerInterceptor {
         if (token.isEmpty()) {
             return null;
         }
+        AuthUser user;
         try {
-            return tokenProvider.parseToken(token);
+            user = tokenProvider.parseToken(token);
         } catch (RuntimeException exception) {
             return null;
         }
+        AppUser account = userMapper.selectById(user.userId());
+        if (account == null) {
+            return null;
+        }
+        if (!"ACTIVE".equals(account.getStatus())) {
+            throw new BusinessException(40301, "账号已被锁定或停用", HttpStatus.FORBIDDEN);
+        }
+        return user;
     }
 
     private boolean isPublic(String path, String method) {
@@ -81,8 +94,18 @@ public class AuthInterceptor implements HandlerInterceptor {
         }
         if ("GET".equalsIgnoreCase(method)) {
             return "/api/interaction/comment".equals(path)
-                    || path.startsWith("/api/interaction/rating/");
+                    || path.startsWith("/api/interaction/rating/")
+                    || isPublicNovelGet(path);
         }
         return false;
+    }
+
+    private boolean isPublicNovelGet(String path) {
+        return "/api/novel/list".equals(path)
+                || "/api/novel/search".equals(path)
+                || "/api/novel/tag/list".equals(path)
+                || path.startsWith("/api/novel/chapter/")
+                || path.matches("/api/novel/\\d+")
+                || path.matches("/api/novel/\\d+/chapters");
     }
 }

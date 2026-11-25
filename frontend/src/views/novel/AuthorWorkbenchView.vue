@@ -1,5 +1,5 @@
 <script setup>
-import { computed, inject, nextTick, onMounted, reactive, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Refresh } from '@element-plus/icons-vue'
@@ -17,12 +17,10 @@ import {
   updateChapter,
   updateNovel,
 } from '@/api/novel'
+import { isLoggedIn } from '@/api/auth'
 
 const router = useRouter()
-const token = inject('novelToken', ref(''))
-const openTokenDialog = inject('openNovelTokenDialog', () => {})
-
-const hasToken = computed(() => Boolean(String(token.value || '').trim()))
+const loggedIn = ref(isLoggedIn())
 
 const novels = ref([])
 const novelsLoading = ref(false)
@@ -179,7 +177,7 @@ async function loadTags() {
 }
 
 async function loadNovels() {
-  if (!hasToken.value) return
+  if (!loggedIn.value) return
   novelsLoading.value = true
   novelsError.value = ''
   try {
@@ -476,23 +474,9 @@ watch(selectedNovelId, (value) => {
   if (value) loadChapters()
 })
 
-watch(token, (value) => {
-  if (String(value || '').trim()) {
-    loadNovels()
-  } else {
-    novels.value = []
-    novelsTotal.value = 0
-    selectedNovelId.value = ''
-    chapters.value = []
-    chaptersTotal.value = 0
-    novelsError.value = ''
-    chaptersError.value = ''
-  }
-})
-
 onMounted(() => {
   loadTags()
-  if (hasToken.value) loadNovels()
+  if (loggedIn.value) loadNovels()
 })
 </script>
 
@@ -503,23 +487,22 @@ onMounted(() => {
         <p class="page-eyebrow">AUTHOR / 创作台</p>
         <h1>我的创作台</h1>
         <p class="page-description">
-          管理本人作品与章节草稿、发布与下架。作者身份由令牌解析，页面不提交 authorId。
+          管理本人作品与章节草稿、发布与下架。作者身份由登录会话解析，页面不提交 authorId。
         </p>
       </div>
-      <div v-if="hasToken" class="heading-actions">
+      <div v-if="loggedIn" class="heading-actions">
         <el-button :icon="Refresh" :loading="novelsLoading" @click="loadNovels">刷新</el-button>
         <el-button type="primary" :icon="Plus" @click="openCreateNovel">新建作品</el-button>
       </div>
     </header>
 
-    <section v-if="!hasToken" class="token-guide">
-      <el-empty description="尚未设置访问令牌">
+    <section v-if="!loggedIn" class="token-guide">
+      <el-empty description="请先登录后再使用创作台">
         <p class="guide-text">
-          创作台接口需要 <code>Authorization: Bearer &lt;JWT&gt;</code>，令牌中的角色须为 AUTHOR 或 ADMIN。
-          请先设置 A 模块登录返回的令牌；未设置前不会发起任何写请求。
+          创作台接口需要登录会话，登录用户的角色须为 AUTHOR 或 ADMIN。未登录前不会发起任何写请求。
         </p>
         <div class="guide-actions">
-          <el-button type="primary" @click="openTokenDialog">设置令牌</el-button>
+          <el-button type="primary" @click="router.push({ path: '/login', query: { redirect: '/author' } })">去登录</el-button>
           <el-button @click="router.push('/bookstore')">先去书城看看</el-button>
         </div>
       </el-empty>
@@ -569,7 +552,7 @@ onMounted(() => {
           <el-alert type="error" :title="novelsError" show-icon :closable="false" />
           <div class="state-actions">
             <el-button type="primary" size="small" @click="loadNovels">重试</el-button>
-            <el-button size="small" @click="openTokenDialog">重新设置令牌</el-button>
+            <el-button size="small" @click="router.push('/account')">我的书院</el-button>
           </div>
         </div>
 

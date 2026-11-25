@@ -138,7 +138,7 @@ const routes = [
         path: '',
         name: 'AuthorWorkbench',
         component: () => import('@/views/novel/AuthorWorkbenchView.vue'),
-        meta: { title: '创作台' },
+        meta: { title: '创作台', requiresAuth: true },
       },
     ],
   },
