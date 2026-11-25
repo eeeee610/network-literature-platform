@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.novel.platform.modules.interaction.mapper.RankingItemMapper">
+
+    <select id="selectPeriods" resultType="com.novel.platform.modules.interaction.dto.RankingPeriodRow">
+        SELECT i.period_no,
+               COUNT(*) AS item_count,
+               MAX(i.created_at) AS created_at
+        FROM ranking_item i
+        JOIN ranking_config c ON c.ranking_id = i.ranking_id
+        WHERE c.ranking_code = #{rankingCode}
+        GROUP BY i.period_no
+        ORDER BY i.period_no DESC
+        LIMIT #{limit}
+    </select>
+</mapper>

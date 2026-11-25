@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.novel.platform.modules.interaction.mapper.RankingConfigMapper">
+
+    <sql id="configColumns">
+        c.ranking_id,
+        c.ranking_code,
+        c.ranking_name,
+        c.ranking_type,
+        c.period_type,
+        c.top_n,
+        c.weight_config,
+        c.is_active,
+        c.updated_at,
+        (SELECT MAX(i.period_no) FROM ranking_item i WHERE i.ranking_id = c.ranking_id) AS latest_period_no,
+        COALESCE((
+            SELECT COUNT(*) FROM ranking_item i2
+            WHERE i2.ranking_id = c.ranking_id
+              AND i2.period_no = (
+                  SELECT MAX(i3.period_no) FROM ranking_item i3 WHERE i3.ranking_id = c.ranking_id
+              )
+        ), 0) AS latest_item_count
+    </sql>
+
+    <select id="selectActiveWithLatest" resultType="com.novel.platform.modules.interaction.dto.RankingConfigRow">
+        SELECT <include refid="configColumns"/>
+        FROM ranking_config c
+        WHERE c.is_active = 1
+        ORDER BY c.ranking_id
+    </select>
+
+    <select id="selectAllWithLatest" resultType="com.novel.platform.modules.interaction.dto.RankingConfigRow">
+        SELECT <include refid="configColumns"/>
+        FROM ranking_config c
+        ORDER BY c.ranking_id
+    </select>
+
+    <select id="selectRowByCode" resultType="com.novel.platform.modules.interaction.dto.RankingConfigRow">
+        SELECT <include refid="configColumns"/>
+        FROM ranking_config c
+        WHERE c.ranking_code = #{rankingCode}
+    </select>
+</mapper>
