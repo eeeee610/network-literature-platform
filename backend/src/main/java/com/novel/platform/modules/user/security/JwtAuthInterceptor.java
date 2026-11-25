@@ -1,4 +1,4 @@
-package com.novel.platform.common.security;
+package com.novel.platform.modules.user.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.novel.platform.common.api.ApiResponse;
@@ -11,8 +11,8 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import java.nio.charset.StandardCharsets;
 
 /**
- * JWT 拦截器：只挂载到 /api/user/**、/api/auth/me、/api/admin/**。
- * 现有 /api/admin/dashboard/** Mock 接口在 WebConfig 中豁免，避免破坏 D 的现有页面。
+ * A 模块 JWT 拦截器：只挂载到 /api/user/** 和 /api/auth/me。
+ * D 的 /api/admin/**、现有 WebConfig 与 Mock 接口完全不受影响。
  */
 @Component
 public class JwtAuthInterceptor implements HandlerInterceptor {
@@ -40,10 +40,6 @@ public class JwtAuthInterceptor implements HandlerInterceptor {
 
         try {
             JwtUser user = jwtService.parse(authorization.substring(7).trim());
-            if (request.getRequestURI().startsWith("/api/admin/") && !"ADMIN".equals(user.role())) {
-                writeError(response, 403, 40300, "无权访问管理端接口");
-                return false;
-            }
             UserContext.set(user);
             return true;
         } catch (IllegalArgumentException exception) {

@@ -1,6 +1,4 @@
-package com.novel.platform.common.api;
-
-import com.baomidou.mybatisplus.core.metadata.IPage;
+package com.novel.platform.modules.user.dto;
 
 import java.util.List;
 
@@ -9,8 +7,8 @@ import java.util.List;
  */
 public record PageResponse<T>(List<T> list, long total, long page, long pageSize) {
 
-    public static <T> PageResponse<T> from(IPage<T> page) {
-        return new PageResponse<>(page.getRecords(), page.getTotal(), page.getCurrent(), page.getSize());
+    public static <T> PageResponse<T> of(List<T> list, long total, long page, long pageSize) {
+        return new PageResponse<>(list, total, page, pageSize);
     }
 
     public static <T> PageResponse<T> empty(long page, long pageSize) {

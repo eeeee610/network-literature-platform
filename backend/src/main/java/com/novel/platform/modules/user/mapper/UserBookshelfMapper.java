@@ -1,13 +1,13 @@
 package com.novel.platform.modules.user.mapper;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.novel.platform.modules.user.dto.ShelfItemResponse;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
+
+import java.util.List;
 
 public interface UserBookshelfMapper {
 
@@ -33,8 +33,14 @@ public interface UserBookshelfMapper {
             LEFT JOIN chapter c ON c.chapter_id = ub.last_read_chapter_id
             WHERE ub.user_id = #{userId}
             ORDER BY ub.is_top DESC, ub.updated_at DESC
+            LIMIT #{offset}, #{limit}
             """)
-    IPage<ShelfItemResponse> selectShelfPage(Page<ShelfItemResponse> page, @Param("userId") Long userId);
+    List<ShelfItemResponse> selectShelfPage(@Param("userId") Long userId,
+                                            @Param("offset") int offset,
+                                            @Param("limit") int limit);
+
+    @Select("SELECT COUNT(*) FROM user_bookshelf WHERE user_id = #{userId}")
+    long countShelf(@Param("userId") Long userId);
 
     @Insert("""
             INSERT INTO user_bookshelf (user_id, novel_id, is_top, is_notify)

@@ -1,8 +1,5 @@
-package com.novel.platform.common.security;
+package com.novel.platform.modules.user.security;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
-@ConfigurationProperties(prefix = "app.jwt")
 public record JwtProperties(String secret, Long expirationSeconds) {
 
     public String effectiveSecret() {

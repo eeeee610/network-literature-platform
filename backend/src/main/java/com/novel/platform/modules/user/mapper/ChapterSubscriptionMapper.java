@@ -1,10 +1,10 @@
 package com.novel.platform.modules.user.mapper;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.novel.platform.modules.user.dto.SubscriptionItemResponse;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 public interface ChapterSubscriptionMapper {
 
@@ -23,7 +23,12 @@ public interface ChapterSubscriptionMapper {
             JOIN novel n ON n.novel_id = s.novel_id
             WHERE s.user_id = #{userId}
             ORDER BY s.subscribed_at DESC
+            LIMIT #{offset}, #{limit}
             """)
-    IPage<SubscriptionItemResponse> selectSubscriptionPage(Page<SubscriptionItemResponse> page,
-                                                           @Param("userId") Long userId);
+    List<SubscriptionItemResponse> selectSubscriptionPage(@Param("userId") Long userId,
+                                                          @Param("offset") int offset,
+                                                          @Param("limit") int limit);
+
+    @Select("SELECT COUNT(*) FROM chapter_subscription WHERE user_id = #{userId}")
+    long countSubscription(@Param("userId") Long userId);
 }

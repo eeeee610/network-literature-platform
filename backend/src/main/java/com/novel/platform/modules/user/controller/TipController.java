@@ -1,8 +1,8 @@
 package com.novel.platform.modules.user.controller;
 
 import com.novel.platform.common.api.ApiResponse;
-import com.novel.platform.common.api.PageResponse;
-import com.novel.platform.common.security.UserContext;
+import com.novel.platform.modules.user.dto.PageResponse;
+import com.novel.platform.modules.user.security.UserContext;
 import com.novel.platform.modules.user.dto.TipItemResponse;
 import com.novel.platform.modules.user.dto.TipRequest;
 import com.novel.platform.modules.user.dto.TipResult;

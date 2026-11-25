@@ -1,12 +1,11 @@
 package com.novel.platform.modules.user.mapper;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.novel.platform.modules.user.dto.TransactionItemResponse;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public interface AccountTransactionMapper {
 
@@ -24,9 +23,11 @@ public interface AccountTransactionMapper {
             FROM account_transaction
             WHERE user_id = #{userId}
             ORDER BY created_at DESC, txn_id DESC
+            LIMIT #{offset}, #{limit}
             """)
-    IPage<TransactionItemResponse> selectTransactionPage(Page<TransactionItemResponse> page,
-                                                          @Param("userId") Long userId);
+    List<TransactionItemResponse> selectTransactionPage(@Param("userId") Long userId,
+                                                        @Param("offset") int offset,
+                                                        @Param("limit") int limit);
 
     @Select("""
             SELECT COALESCE(SUM(CASE WHEN direction = 'IN' THEN amount ELSE 0 END), 0.00)

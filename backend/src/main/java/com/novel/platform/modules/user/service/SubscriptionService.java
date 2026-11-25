@@ -1,14 +1,14 @@
 package com.novel.platform.modules.user.service;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.novel.platform.common.api.PageResponse;
 import com.novel.platform.common.exception.BusinessException;
+import com.novel.platform.modules.user.dto.PageResponse;
 import com.novel.platform.modules.user.dto.SubscribeResult;
 import com.novel.platform.modules.user.dto.SubscriptionItemResponse;
 import com.novel.platform.modules.user.mapper.ChapterSubscriptionMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -26,8 +26,11 @@ public class SubscriptionService {
     public PageResponse<SubscriptionItemResponse> list(Long userId, int page, int pageSize) {
         int safePage = Math.max(page, 1);
         int safeSize = Math.min(Math.max(pageSize, 1), 100);
-        Page<SubscriptionItemResponse> pageRequest = new Page<>(safePage, safeSize);
-        return PageResponse.from(subscriptionMapper.selectSubscriptionPage(pageRequest, userId));
+        int offset = (safePage - 1) * safeSize;
+        long total = subscriptionMapper.countSubscription(userId);
+        List<SubscriptionItemResponse> list =
+                subscriptionMapper.selectSubscriptionPage(userId, offset, safeSize);
+        return PageResponse.of(list, total, safePage, safeSize);
     }
 
     public SubscribeResult subscribe(Long userId, String chapterIdText, String requestNoText) {

@@ -1,7 +1,7 @@
 package com.novel.platform.modules.user.controller;
 
 import com.novel.platform.common.api.ApiResponse;
-import com.novel.platform.common.security.UserContext;
+import com.novel.platform.modules.user.security.UserContext;
 import com.novel.platform.modules.user.dto.AuthResponse;
 import com.novel.platform.modules.user.dto.LoginRequest;
 import com.novel.platform.modules.user.dto.RegisterRequest;

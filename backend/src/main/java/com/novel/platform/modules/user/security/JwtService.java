@@ -1,4 +1,4 @@
-package com.novel.platform.common.security;
+package com.novel.platform.modules.user.security;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

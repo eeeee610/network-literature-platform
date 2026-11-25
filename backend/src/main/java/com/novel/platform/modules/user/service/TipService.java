@@ -1,8 +1,7 @@
 package com.novel.platform.modules.user.service;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.novel.platform.common.api.PageResponse;
 import com.novel.platform.common.exception.BusinessException;
+import com.novel.platform.modules.user.dto.PageResponse;
 import com.novel.platform.modules.user.dto.TipItemResponse;
 import com.novel.platform.modules.user.dto.TipRequest;
 import com.novel.platform.modules.user.dto.TipResult;
@@ -11,6 +10,7 @@ import com.novel.platform.modules.user.mapper.RewardTipMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -30,8 +30,10 @@ public class TipService {
     public PageResponse<TipItemResponse> list(Long userId, int page, int pageSize) {
         int safePage = Math.max(page, 1);
         int safeSize = Math.min(Math.max(pageSize, 1), 100);
-        Page<TipItemResponse> pageRequest = new Page<>(safePage, safeSize);
-        return PageResponse.from(tipMapper.selectTipPage(pageRequest, userId));
+        int offset = (safePage - 1) * safeSize;
+        long total = tipMapper.countTip(userId);
+        List<TipItemResponse> list = tipMapper.selectTipPage(userId, offset, safeSize);
+        return PageResponse.of(list, total, safePage, safeSize);
     }
 
     public TipResult tip(Long userId, TipRequest request) {

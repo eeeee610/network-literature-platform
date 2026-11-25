@@ -1,14 +1,15 @@
 package com.novel.platform.modules.user.service;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.novel.platform.common.api.PageResponse;
 import com.novel.platform.common.exception.BusinessException;
+import com.novel.platform.modules.user.dto.PageResponse;
 import com.novel.platform.modules.user.dto.ShelfItemResponse;
 import com.novel.platform.modules.user.mapper.CatalogQueryMapper;
 import com.novel.platform.modules.user.mapper.UserBookshelfMapper;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class BookshelfService {
@@ -24,8 +25,10 @@ public class BookshelfService {
     public PageResponse<ShelfItemResponse> list(Long userId, int page, int pageSize) {
         int safePage = Math.max(page, 1);
         int safeSize = Math.min(Math.max(pageSize, 1), 100);
-        Page<ShelfItemResponse> pageRequest = new Page<>(safePage, safeSize);
-        return PageResponse.from(shelfMapper.selectShelfPage(pageRequest, userId));
+        int offset = (safePage - 1) * safeSize;
+        long total = shelfMapper.countShelf(userId);
+        List<ShelfItemResponse> list = shelfMapper.selectShelfPage(userId, offset, safeSize);
+        return PageResponse.of(list, total, safePage, safeSize);
     }
 
     public void add(Long userId, String novelIdText) {

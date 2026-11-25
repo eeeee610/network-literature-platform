@@ -27,7 +27,7 @@ Authorization: Bearer <JWT>
 ```
 
 JWT 载荷包含 `sub`（userId）、`username`、`role`、`iat`、`exp`，默认有效期 86400 秒。  
-角色：`READER` 读者、`AUTHOR` 作者、`ADMIN` 管理员。`/api/admin/**`（除 dashboard Mock）要求 `ADMIN`；`/api/user/**` 和 `/api/auth/me` 要求登录。
+角色：`READER` 读者、`AUTHOR` 作者、`ADMIN` 管理员。A 模块只拦截 `/api/user/**` 和 `/api/auth/me`；D 的 `/api/admin/**` 与现有 Mock 接口保持原样，不由 A 修改。
 
 ### 1.3 分页
 
@@ -391,7 +391,6 @@ GET /api/user/transactions?page=1&pageSize=10
 | 400 | 40000 | 参数缺失、格式错误、ID 非数字 | 修正输入后重试 |
 | 401 | 40100 | 未携带/无效/过期 JWT | 清理本地 token，跳登录 |
 | 401 | 40101 | 账号或密码错误 | 提示重新输入 |
-| 403 | 40300 | 非管理员访问管理端接口 | 停止操作 |
 | 403 | 40301 | 账号被锁定/禁用 | 联系管理员 |
 | 404 | 40410 | 小说不存在 | 检查 novelId |
 | 404 | 40411 | 书架记录不存在 | 刷新书架 |
@@ -424,13 +423,14 @@ GET /api/user/transactions?page=1&pageSize=10
 | `/subscriptions` | 章节订阅 | 输入 chapterId 订阅、查看订阅记录 |
 | `/tips` | 打赏作者 | 输入 novelId/chapterId/金额/留言，查看打赏记录 |
 | `/balance` | 余额流水 | 余额、累计收入/支出、分页流水 |
-| `/admin/**` | 运营后台 | 保留 D 的现有页面；前端要求 ADMIN token |
+
+A 读者端是独立入口 `frontend/reader.html`（Vite 配置 `vite.reader.config.js`，开发端口 5174，hash 路由），不修改 D 的 `index.html`、`src/main.js`、`src/router/index.js`。D 的运营台入口 `index.html` 保持不变。
 
 ## 11. 联调记录
 
 | 日期 | 前端 | 后端 | 环境 | 结果 | 问题 |
 |---|---|---|---|---|---|
-| 2026-11-24 | A | A | 本地构建 | 前端 Vite 构建通过；后端 Maven 编译通过；JWT 单元测试 2/2 通过；应用可启动，管理员 Mock 接口 200、未登录用户接口 401 | 数据库未连接；现有 Spring MockMvc 测试在 JDK 27 下 Mockito 初始化失败，建议测试环境使用 JDK 17 |
+| 2026-11-24 | A | A | 本地构建 | D 管理端入口构建通过；A reader.html 独立构建通过；后端 Maven 编译通过；JWT 单元测试 2/2 通过；应用可启动，管理员 Mock 接口 200、未登录用户接口 401 | 数据库未连接；现有 Spring MockMvc 测试在 JDK 27 下 Mockito 初始化失败，建议测试环境使用 JDK 17 |
 
 ## 12. 变更记录
 

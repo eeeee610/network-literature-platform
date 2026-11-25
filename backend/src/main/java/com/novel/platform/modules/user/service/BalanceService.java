@@ -1,9 +1,8 @@
 package com.novel.platform.modules.user.service;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.novel.platform.common.api.PageResponse;
 import com.novel.platform.common.exception.BusinessException;
 import com.novel.platform.modules.user.dto.BalanceResponse;
+import com.novel.platform.modules.user.dto.PageResponse;
 import com.novel.platform.modules.user.dto.TransactionItemResponse;
 import com.novel.platform.modules.user.entity.UserAccount;
 import com.novel.platform.modules.user.mapper.AccountTransactionMapper;
@@ -12,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class BalanceService {
@@ -43,7 +43,10 @@ public class BalanceService {
     public PageResponse<TransactionItemResponse> listTransactions(Long userId, int page, int pageSize) {
         int safePage = Math.max(page, 1);
         int safeSize = Math.min(Math.max(pageSize, 1), 100);
-        Page<TransactionItemResponse> pageRequest = new Page<>(safePage, safeSize);
-        return PageResponse.from(transactionMapper.selectTransactionPage(pageRequest, userId));
+        int offset = (safePage - 1) * safeSize;
+        long total = transactionMapper.countByUser(userId);
+        List<TransactionItemResponse> list =
+                transactionMapper.selectTransactionPage(userId, offset, safeSize);
+        return PageResponse.of(list, total, safePage, safeSize);
     }
 }

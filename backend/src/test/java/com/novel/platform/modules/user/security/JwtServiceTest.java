@@ -1,4 +1,4 @@
-package com.novel.platform.common.security;
+package com.novel.platform.modules.user.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -32,3 +32,4 @@ class JwtServiceTest {
         assertThrows(IllegalArgumentException.class, () -> jwtService.parse(tampered));
     }
 }
+

@@ -2,7 +2,6 @@ package com.novel.platform.modules.user.service;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.novel.platform.common.exception.BusinessException;
-import com.novel.platform.common.security.JwtService;
 import com.novel.platform.modules.user.dto.AuthResponse;
 import com.novel.platform.modules.user.dto.LoginRequest;
 import com.novel.platform.modules.user.dto.RegisterRequest;
@@ -11,8 +10,9 @@ import com.novel.platform.modules.user.entity.AppUser;
 import com.novel.platform.modules.user.entity.UserAccount;
 import com.novel.platform.modules.user.mapper.AppUserMapper;
 import com.novel.platform.modules.user.mapper.UserAccountMapper;
+import com.novel.platform.modules.user.security.JwtService;
+import com.novel.platform.modules.user.security.PasswordHasher;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,14 +24,14 @@ public class AuthService {
 
     private final AppUserMapper userMapper;
     private final UserAccountMapper accountMapper;
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordHasher passwordHasher;
     private final JwtService jwtService;
 
     public AuthService(AppUserMapper userMapper, UserAccountMapper accountMapper,
-                       PasswordEncoder passwordEncoder, JwtService jwtService) {
+                       PasswordHasher passwordHasher, JwtService jwtService) {
         this.userMapper = userMapper;
         this.accountMapper = accountMapper;
-        this.passwordEncoder = passwordEncoder;
+        this.passwordHasher = passwordHasher;
         this.jwtService = jwtService;
     }
 
@@ -59,7 +59,7 @@ public class AuthService {
 
         AppUser user = new AppUser();
         user.setUsername(username);
-        user.setPasswordHash(passwordEncoder.encode(request.password()));
+        user.setPasswordHash(passwordHasher.encode(request.password()));
         user.setEmail(email);
         user.setPhone(phone);
         user.setNickname(nickname);
@@ -78,7 +78,7 @@ public class AuthService {
     public AuthResponse login(LoginRequest request) {
         String accountName = request.account().trim();
         AppUser user = userMapper.findByAccount(accountName);
-        if (user == null || !passwordEncoder.matches(request.password(), user.getPasswordHash())) {
+        if (user == null || !passwordHasher.matches(request.password(), user.getPasswordHash())) {
             throw new BusinessException(40101, "账号或密码错误", HttpStatus.UNAUTHORIZED);
         }
         if (!"ACTIVE".equals(user.getStatus())) {

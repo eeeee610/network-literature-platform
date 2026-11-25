@@ -1,4 +1,4 @@
-package com.novel.platform.common.security;
+package com.novel.platform.modules.user.security;
 
 import com.novel.platform.common.exception.BusinessException;
 import org.springframework.http.HttpStatus;

@@ -35,7 +35,7 @@ export function useAuth() {
   }
 
   function homePath() {
-    return isAdmin.value ? '/admin/dashboard' : '/shelf'
+    return '/shelf'
   }
 
   return { state, isLoggedIn, isAdmin, setSession, clearSession, homePath }

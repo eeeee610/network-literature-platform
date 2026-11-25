@@ -1,10 +1,10 @@
 package com.novel.platform.modules.user.mapper;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.novel.platform.modules.user.dto.TipItemResponse;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 public interface RewardTipMapper {
 
@@ -27,6 +27,12 @@ public interface RewardTipMapper {
             LEFT JOIN chapter c ON c.chapter_id = t.chapter_id
             WHERE t.from_user_id = #{userId}
             ORDER BY t.created_at DESC, t.tip_id DESC
+            LIMIT #{offset}, #{limit}
             """)
-    IPage<TipItemResponse> selectTipPage(Page<TipItemResponse> page, @Param("userId") Long userId);
+    List<TipItemResponse> selectTipPage(@Param("userId") Long userId,
+                                        @Param("offset") int offset,
+                                        @Param("limit") int limit);
+
+    @Select("SELECT COUNT(*) FROM reward_tip WHERE from_user_id = #{userId}")
+    long countTip(@Param("userId") Long userId);
 }
