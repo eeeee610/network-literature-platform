@@ -4,13 +4,42 @@ import { ElMessage } from 'element-plus'
 export const TOKEN_KEY = 'novel_platform_token'
 export const USER_KEY = 'novel_platform_user'
 
+// VSCode 集成浏览器等 webview 环境可能禁用或隔离 localStorage，
+// 此时降级到内存存储，保证当前会话内登录流程可用。
+const memoryStore = new Map()
+
+function safeGetItem(key) {
+  try {
+    return localStorage.getItem(key)
+  } catch {
+    return memoryStore.has(key) ? memoryStore.get(key) : null
+  }
+}
+
+export function safeSetItem(key, value) {
+  try {
+    localStorage.setItem(key, value)
+  } catch {
+    memoryStore.set(key, value)
+  }
+}
+
+export function safeRemoveItem(key) {
+  try {
+    localStorage.removeItem(key)
+  } catch {
+    // 忽略：存储不可用时仅清理内存
+  }
+  memoryStore.delete(key)
+}
+
 export function getToken() {
-  return localStorage.getItem(TOKEN_KEY) || ''
+  return safeGetItem(TOKEN_KEY) || ''
 }
 
 export function getStoredUser() {
   try {
-    return JSON.parse(localStorage.getItem(USER_KEY) || 'null')
+    return JSON.parse(safeGetItem(USER_KEY) || 'null')
   } catch {
     return null
   }
@@ -48,8 +77,8 @@ request.interceptors.response.use(
     const status = error.response?.status
     const message = error.response?.data?.message || '无法连接服务器，请确认后端已启动'
     if (status === 401) {
-      localStorage.removeItem(TOKEN_KEY)
-      localStorage.removeItem(USER_KEY)
+      safeRemoveItem(TOKEN_KEY)
+      safeRemoveItem(USER_KEY)
       ElMessage.error('登录已失效，请重新登录')
       if (!window.location.pathname.startsWith('/login')) {
         const redirect = encodeURIComponent(window.location.pathname + window.location.search)

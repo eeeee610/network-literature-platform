@@ -1,4 +1,11 @@
-import request, { TOKEN_KEY, USER_KEY, getStoredUser, getToken } from './request'
+import request, {
+  TOKEN_KEY,
+  USER_KEY,
+  getStoredUser,
+  getToken,
+  safeRemoveItem,
+  safeSetItem,
+} from './request'
 
 export function isLoggedIn() {
   return Boolean(getToken())
@@ -13,8 +20,8 @@ export function currentUser() {
 }
 
 export function setSession(loginData) {
-  localStorage.setItem(TOKEN_KEY, loginData.token)
-  localStorage.setItem(
+  safeSetItem(TOKEN_KEY, loginData.token)
+  safeSetItem(
     USER_KEY,
     JSON.stringify({
       userId: loginData.userId,
@@ -27,13 +34,13 @@ export function setSession(loginData) {
 }
 
 export function clearSession() {
-  localStorage.removeItem(TOKEN_KEY)
-  localStorage.removeItem(USER_KEY)
+  safeRemoveItem(TOKEN_KEY)
+  safeRemoveItem(USER_KEY)
 }
 
 export function updateStoredUser(profile) {
   const current = getStoredUser() || {}
-  localStorage.setItem(USER_KEY, JSON.stringify({ ...current, ...profile }))
+  safeSetItem(USER_KEY, JSON.stringify({ ...current, ...profile }))
 }
 
 export async function login(payload) {

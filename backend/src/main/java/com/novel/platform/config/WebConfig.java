@@ -17,8 +17,11 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
+        // 允许任意来源，兼容 VSCode 集成浏览器 / webview 等隔离上下文
+        // （此类环境可能以 Origin: null 发起请求）。接口鉴权依赖 Bearer Token，
+        // 不使用 Cookie，因此放开来源不会引入凭证类跨站风险。
         registry.addMapping("/api/**")
-                .allowedOrigins("http://localhost:5173", "http://127.0.0.1:5173")
+                .allowedOriginPatterns("*")
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
                 .maxAge(3600);
