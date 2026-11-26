@@ -1,0 +1,372 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-11-27T00:00:00.000Z" agent="C" version="24.0.0" type="device">
+  <diagram id="c-interaction-ranking-er" name="C_互动与榜单_ER子图">
+    <mxGraphModel dx="1520" dy="1500" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1520" pageHeight="1650" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="C 互动与榜单模块 ER 子图 v0.2  |  2026-11-20  |  负责人：C" style="text;html=1;align=left;verticalAlign=middle;fontSize=18;fontStyle=1;fontColor=#1F2937;fontFamily=Microsoft YaHei;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="1200" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="app_user" value="app_user  用户表（A 模块 / 外部）" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;rounded=1;fillColor=#6B7280;swimlaneFillColor=#F3F4F6;strokeColor=#9CA3AF;fontColor=#FFFFFF;fontSize=13;fontFamily=Microsoft YaHei;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="120" width="280" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="app_user_f1" value="PK&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;user_id" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="app_user">
+          <mxGeometry x="0" y="32" width="280" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="app_user_f2" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;nickname" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="app_user">
+          <mxGeometry x="0" y="52" width="280" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="app_user_f3" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;status" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="app_user">
+          <mxGeometry x="0" y="72" width="280" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="novel" value="novel  小说表（B 模块 / 外部）" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;rounded=1;fillColor=#4B5563;swimlaneFillColor=#F3F4F6;strokeColor=#9CA3AF;fontColor=#FFFFFF;fontSize=13;fontFamily=Microsoft YaHei;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="420" width="280" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="novel_f1" value="PK&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;novel_id" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="novel">
+          <mxGeometry x="0" y="32" width="280" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="novel_f2" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;title" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="novel">
+          <mxGeometry x="0" y="52" width="280" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="novel_f3" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;author_id" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="novel">
+          <mxGeometry x="0" y="72" width="280" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="chapter" value="chapter  章节表（B 模块 / 外部）" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;rounded=1;fillColor=#4B5563;swimlaneFillColor=#F3F4F6;strokeColor=#9CA3AF;fontColor=#FFFFFF;fontSize=13;fontFamily=Microsoft YaHei;dashed=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="640" width="280" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="chapter_f1" value="PK&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;chapter_id" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="chapter">
+          <mxGeometry x="0" y="32" width="280" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="chapter_f2" value="FK&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;novel_id" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="chapter">
+          <mxGeometry x="0" y="52" width="280" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="chapter_f3" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;title" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="chapter">
+          <mxGeometry x="0" y="72" width="280" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="comment" value="comment  评论表" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;rounded=1;fillColor=#1F4E79;swimlaneFillColor=#DAE8FC;strokeColor=#6C8EBF;fontColor=#FFFFFF;fontSize=13;fontFamily=Microsoft YaHei;" vertex="1" parent="1">
+          <mxGeometry x="520" y="100" width="400" height="320" as="geometry" />
+        </mxCell>
+        <mxCell id="comment_f1" value="PK&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;comment_id" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="comment">
+          <mxGeometry x="0" y="32" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="comment_f2" value="逻辑FK&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;novel_id" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="comment">
+          <mxGeometry x="0" y="52" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="comment_f3" value="逻辑FK&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;chapter_id" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="comment">
+          <mxGeometry x="0" y="72" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="comment_f4" value="FK&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;user_id" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="comment">
+          <mxGeometry x="0" y="92" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="comment_f5" value="自引用&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;parent_id" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="comment">
+          <mxGeometry x="0" y="112" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="comment_f6" value="FK&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;reply_to_user_id" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="comment">
+          <mxGeometry x="0" y="132" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="comment_f7" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;content" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="comment">
+          <mxGeometry x="0" y="152" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="comment_f8" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;like_count" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="comment">
+          <mxGeometry x="0" y="172" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="comment_f9" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;reply_count" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="comment">
+          <mxGeometry x="0" y="192" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="comment_f10" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;is_top" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="comment">
+          <mxGeometry x="0" y="212" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="comment_f11" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;status" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="comment">
+          <mxGeometry x="0" y="232" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="comment_f12" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;audit_status" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="comment">
+          <mxGeometry x="0" y="252" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="comment_f13" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;created_at" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="comment">
+          <mxGeometry x="0" y="272" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="comment_f14" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;updated_at" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="comment">
+          <mxGeometry x="0" y="292" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="comment_like" value="comment_like  评论点赞表" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;rounded=1;fillColor=#38761D;swimlaneFillColor=#D9EAD3;strokeColor=#82B366;fontColor=#FFFFFF;fontSize=13;fontFamily=Microsoft YaHei;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="100" width="340" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="comment_like_f1" value="PK&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;like_id" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="comment_like">
+          <mxGeometry x="0" y="32" width="340" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="comment_like_f2" value="FK&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;comment_id" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="comment_like">
+          <mxGeometry x="0" y="52" width="340" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="comment_like_f3" value="FK&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;user_id" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="comment_like">
+          <mxGeometry x="0" y="72" width="340" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="comment_like_f4" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;created_at" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="comment_like">
+          <mxGeometry x="0" y="92" width="340" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="novel_rating" value="novel_rating  小说评分表" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;rounded=1;fillColor=#BF9000;swimlaneFillColor=#FFF2CC;strokeColor=#D6B656;fontColor=#FFFFFF;fontSize=13;fontFamily=Microsoft YaHei;" vertex="1" parent="1">
+          <mxGeometry x="520" y="500" width="400" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="novel_rating_f1" value="PK&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;rating_id" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="novel_rating">
+          <mxGeometry x="0" y="32" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="novel_rating_f2" value="FK&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;user_id" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="novel_rating">
+          <mxGeometry x="0" y="52" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="novel_rating_f3" value="逻辑FK&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;novel_id" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="novel_rating">
+          <mxGeometry x="0" y="72" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="novel_rating_f4" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;score" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="novel_rating">
+          <mxGeometry x="0" y="92" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="novel_rating_f5" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;review_content" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="novel_rating">
+          <mxGeometry x="0" y="112" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="novel_rating_f6" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;status" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="novel_rating">
+          <mxGeometry x="0" y="132" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="novel_rating_f6b" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;review_audit_status" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="novel_rating">
+          <mxGeometry x="0" y="152" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="novel_rating_f7" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;created_at" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="novel_rating">
+          <mxGeometry x="0" y="172" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="novel_rating_f8" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;updated_at" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="novel_rating">
+          <mxGeometry x="0" y="192" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="novel_rating_stat" value="novel_rating_stat  小说评分统计表" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;rounded=1;fillColor=#B45F06;swimlaneFillColor=#FCE5CD;strokeColor=#D79B00;fontColor=#FFFFFF;fontSize=13;fontFamily=Microsoft YaHei;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="500" width="340" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="novel_rating_stat_f1" value="PK/逻辑FK&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;novel_id" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="novel_rating_stat">
+          <mxGeometry x="0" y="32" width="340" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="novel_rating_stat_f2" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;rating_count" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="novel_rating_stat">
+          <mxGeometry x="0" y="52" width="340" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="novel_rating_stat_f3" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;score_total" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="novel_rating_stat">
+          <mxGeometry x="0" y="72" width="340" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="novel_rating_stat_f4" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;avg_score" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="novel_rating_stat">
+          <mxGeometry x="0" y="92" width="340" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="novel_rating_stat_f5" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;updated_at" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="novel_rating_stat">
+          <mxGeometry x="0" y="112" width="340" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="ranking_config" value="ranking_config  榜单配置表" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;rounded=1;fillColor=#0B5394;swimlaneFillColor=#CFE2F3;strokeColor=#6FA8DC;fontColor=#FFFFFF;fontSize=13;fontFamily=Microsoft YaHei;" vertex="1" parent="1">
+          <mxGeometry x="1080" y="780" width="340" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="ranking_config_f1" value="PK&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;ranking_id" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="ranking_config">
+          <mxGeometry x="0" y="32" width="340" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="ranking_config_f2" value="UK&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;ranking_code" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="ranking_config">
+          <mxGeometry x="0" y="52" width="340" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="ranking_config_f3" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;ranking_name" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="ranking_config">
+          <mxGeometry x="0" y="72" width="340" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="ranking_config_f4" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;ranking_type" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="ranking_config">
+          <mxGeometry x="0" y="92" width="340" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="ranking_config_f5" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;period_type" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="ranking_config">
+          <mxGeometry x="0" y="112" width="340" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="ranking_config_f6" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;top_n" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="ranking_config">
+          <mxGeometry x="0" y="132" width="340" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="ranking_config_f7" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;weight_config" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="ranking_config">
+          <mxGeometry x="0" y="152" width="340" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="ranking_config_f8" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;is_active" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="ranking_config">
+          <mxGeometry x="0" y="172" width="340" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="ranking_config_f9" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;created_at" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="ranking_config">
+          <mxGeometry x="0" y="192" width="340" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="ranking_config_f10" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;updated_at" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="ranking_config">
+          <mxGeometry x="0" y="212" width="340" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="ranking_item" value="ranking_item  榜单条目表" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=32;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=0;marginBottom=0;html=1;rounded=1;fillColor=#A61C00;swimlaneFillColor=#F4CCCC;strokeColor=#CC0000;fontColor=#FFFFFF;fontSize=13;fontFamily=Microsoft YaHei;" vertex="1" parent="1">
+          <mxGeometry x="520" y="1020" width="400" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="ranking_item_f1" value="PK&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;item_id" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="ranking_item">
+          <mxGeometry x="0" y="32" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="ranking_item_f2" value="FK&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;ranking_id" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="ranking_item">
+          <mxGeometry x="0" y="52" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="ranking_item_f3" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;period_no" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="ranking_item">
+          <mxGeometry x="0" y="72" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="ranking_item_f4" value="逻辑FK&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;novel_id" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="ranking_item">
+          <mxGeometry x="0" y="92" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="ranking_item_f5" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;rank_no" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="ranking_item">
+          <mxGeometry x="0" y="112" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="ranking_item_f6" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;score" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="ranking_item">
+          <mxGeometry x="0" y="132" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="ranking_item_f7" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;metric_snapshot" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="ranking_item">
+          <mxGeometry x="0" y="152" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="ranking_item_f8" value="&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;created_at" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=8;spacingRight=4;fontSize=10;fontFamily=Microsoft YaHei;fontColor=#111827;overflow=hidden;rotatable=0;" vertex="1" parent="ranking_item">
+          <mxGeometry x="0" y="172" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="rel_app_comment" value="评论用户" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=none;endArrow=open;endFill=0;strokeWidth=1.5;fontSize=10;labelBackgroundColor=#FFFFFF;fontFamily=Microsoft YaHei;strokeColor=#2563EB;exitX=1;exitY=0.1;entryX=0;entryY=0.1;" edge="1" parent="1" source="app_user" target="comment">
+          <mxGeometry relative="1" as="geometry">
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rel_app_comment_src" value="1..1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontFamily=Microsoft YaHei;labelBackgroundColor=#FFFFFF;fontColor=#B91C1C;" vertex="1" connectable="0" parent="rel_app_comment">
+          <mxGeometry x="0.08" relative="1" as="geometry"><mxPoint as="offset" x="0.13" y="-13.0" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel_app_comment_tgt" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontFamily=Microsoft YaHei;labelBackgroundColor=#FFFFFF;fontColor=#B91C1C;" vertex="1" connectable="0" parent="rel_app_comment">
+          <mxGeometry x="0.92" relative="1" as="geometry"><mxPoint as="offset" x="0.13" y="-13.0" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel_app_comment_like" value="点赞用户" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=none;endArrow=open;endFill=0;strokeWidth=1.5;fontSize=10;labelBackgroundColor=#FFFFFF;fontFamily=Microsoft YaHei;strokeColor=#2563EB;exitX=0.85;exitY=0;entryX=0.5;entryY=0;" edge="1" parent="1" source="app_user" target="comment_like">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="278" y="58" />
+              <mxPoint x="1250" y="58" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rel_app_comment_like_src" value="1..1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontFamily=Microsoft YaHei;labelBackgroundColor=#FFFFFF;fontColor=#B91C1C;" vertex="1" connectable="0" parent="rel_app_comment_like">
+          <mxGeometry x="0.02" relative="1" as="geometry"><mxPoint as="offset" x="-13.0" y="-0.0" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel_app_comment_like_tgt" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontFamily=Microsoft YaHei;labelBackgroundColor=#FFFFFF;fontColor=#B91C1C;" vertex="1" connectable="0" parent="rel_app_comment_like">
+          <mxGeometry x="0.98" relative="1" as="geometry"><mxPoint as="offset" x="13.0" y="-0.0" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel_app_rating" value="评分用户" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=none;endArrow=open;endFill=0;strokeWidth=1.5;fontSize=10;labelBackgroundColor=#FFFFFF;fontFamily=Microsoft YaHei;strokeColor=#2563EB;exitX=1;exitY=0.5;entryX=0;entryY=0.15;" edge="1" parent="1" source="app_user" target="novel_rating">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="420" y="170" />
+              <mxPoint x="420" y="530" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rel_app_rating_src" value="1..1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontFamily=Microsoft YaHei;labelBackgroundColor=#FFFFFF;fontColor=#B91C1C;" vertex="1" connectable="0" parent="rel_app_rating">
+          <mxGeometry x="0.029" relative="1" as="geometry"><mxPoint as="offset" x="0.0" y="-13.0" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel_app_rating_tgt" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontFamily=Microsoft YaHei;labelBackgroundColor=#FFFFFF;fontColor=#B91C1C;" vertex="1" connectable="0" parent="rel_app_rating">
+          <mxGeometry x="0.971" relative="1" as="geometry"><mxPoint as="offset" x="0.0" y="-13.0" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel_comment_like" value="点赞评论" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=none;endArrow=open;endFill=0;strokeWidth=1.5;fontSize=10;labelBackgroundColor=#FFFFFF;fontFamily=Microsoft YaHei;strokeColor=#2563EB;exitX=1;exitY=0.15;entryX=0;entryY=0.3;" edge="1" parent="1" source="comment" target="comment_like">
+          <mxGeometry relative="1" as="geometry">
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rel_comment_like_src" value="1..1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontFamily=Microsoft YaHei;labelBackgroundColor=#FFFFFF;fontColor=#B91C1C;" vertex="1" connectable="0" parent="rel_comment_like">
+          <mxGeometry x="0.1" relative="1" as="geometry"><mxPoint as="offset" x="-0.97" y="-12.96" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel_comment_like_tgt" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontFamily=Microsoft YaHei;labelBackgroundColor=#FFFFFF;fontColor=#B91C1C;" vertex="1" connectable="0" parent="rel_comment_like">
+          <mxGeometry x="0.9" relative="1" as="geometry"><mxPoint as="offset" x="-0.97" y="-12.96" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel_comment_reply" value="楼中楼回复" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=none;endArrow=open;endFill=0;strokeWidth=1.5;fontSize=10;labelBackgroundColor=#FFFFFF;fontFamily=Microsoft YaHei;strokeColor=#2563EB;exitX=0.35;exitY=0;entryX=0.1;entryY=0;" edge="1" parent="1" source="comment" target="comment">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="660" y="72" />
+              <mxPoint x="560" y="72" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rel_comment_reply_src" value="0..1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontFamily=Microsoft YaHei;labelBackgroundColor=#FFFFFF;fontColor=#B91C1C;" vertex="1" connectable="0" parent="rel_comment_reply">
+          <mxGeometry x="0.103" relative="1" as="geometry"><mxPoint as="offset" x="-13.0" y="-0.0" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel_comment_reply_tgt" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontFamily=Microsoft YaHei;labelBackgroundColor=#FFFFFF;fontColor=#B91C1C;" vertex="1" connectable="0" parent="rel_comment_reply">
+          <mxGeometry x="0.897" relative="1" as="geometry"><mxPoint as="offset" x="13.0" y="-0.0" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel_novel_comment" value="书评归属" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=none;endArrow=open;endFill=0;strokeWidth=1.5;fontSize=10;labelBackgroundColor=#FFFFFF;fontFamily=Microsoft YaHei;strokeColor=#9CA3AF;dashed=1;exitX=1;exitY=0.1;entryX=0;entryY=0.6;" edge="1" parent="1" source="novel" target="comment">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="360" y="430" />
+              <mxPoint x="360" y="292" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rel_novel_comment_src" value="1..1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontFamily=Microsoft YaHei;labelBackgroundColor=#FFFFFF;fontColor=#B91C1C;" vertex="1" connectable="0" parent="rel_novel_comment">
+          <mxGeometry x="0.047" relative="1" as="geometry"><mxPoint as="offset" x="0.0" y="-13.0" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel_novel_comment_tgt" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontFamily=Microsoft YaHei;labelBackgroundColor=#FFFFFF;fontColor=#B91C1C;" vertex="1" connectable="0" parent="rel_novel_comment">
+          <mxGeometry x="0.953" relative="1" as="geometry"><mxPoint as="offset" x="0.0" y="-13.0" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel_chapter_comment" value="章节评论" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=none;endArrow=open;endFill=0;strokeWidth=1.5;fontSize=10;labelBackgroundColor=#FFFFFF;fontFamily=Microsoft YaHei;strokeColor=#9CA3AF;dashed=1;exitX=1;exitY=0.5;entryX=0;entryY=0.85;" edge="1" parent="1" source="chapter" target="comment">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="380" y="690" />
+              <mxPoint x="380" y="372" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rel_chapter_comment_src" value="0..1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontFamily=Microsoft YaHei;labelBackgroundColor=#FFFFFF;fontColor=#B91C1C;" vertex="1" connectable="0" parent="rel_chapter_comment">
+          <mxGeometry x="0.031" relative="1" as="geometry"><mxPoint as="offset" x="0.0" y="-13.0" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel_chapter_comment_tgt" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontFamily=Microsoft YaHei;labelBackgroundColor=#FFFFFF;fontColor=#B91C1C;" vertex="1" connectable="0" parent="rel_chapter_comment">
+          <mxGeometry x="0.969" relative="1" as="geometry"><mxPoint as="offset" x="0.0" y="-13.0" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel_novel_rating" value="评分小说" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=none;endArrow=open;endFill=0;strokeWidth=1.5;fontSize=10;labelBackgroundColor=#FFFFFF;fontFamily=Microsoft YaHei;strokeColor=#9CA3AF;dashed=1;exitX=1;exitY=0.3;entryX=0;entryY=0.15;" edge="1" parent="1" source="novel" target="novel_rating">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="400" y="450" />
+              <mxPoint x="400" y="530" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rel_novel_rating_src" value="1..1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontFamily=Microsoft YaHei;labelBackgroundColor=#FFFFFF;fontColor=#B91C1C;" vertex="1" connectable="0" parent="rel_novel_rating">
+          <mxGeometry x="0.057" relative="1" as="geometry"><mxPoint as="offset" x="0.0" y="-13.0" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel_novel_rating_tgt" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontFamily=Microsoft YaHei;labelBackgroundColor=#FFFFFF;fontColor=#B91C1C;" vertex="1" connectable="0" parent="rel_novel_rating">
+          <mxGeometry x="0.943" relative="1" as="geometry"><mxPoint as="offset" x="0.0" y="-13.0" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel_novel_rating_stat" value="评分统计" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=none;endArrow=open;endFill=0;strokeWidth=1.5;fontSize=10;labelBackgroundColor=#FFFFFF;fontFamily=Microsoft YaHei;strokeColor=#9CA3AF;dashed=1;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="novel" target="novel_rating_stat">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="340" y="470" />
+              <mxPoint x="340" y="446" />
+              <mxPoint x="1050" y="446" />
+              <mxPoint x="1050" y="570" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rel_novel_rating_stat_src" value="1..1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontFamily=Microsoft YaHei;labelBackgroundColor=#FFFFFF;fontColor=#B91C1C;" vertex="1" connectable="0" parent="rel_novel_rating_stat">
+          <mxGeometry x="0.02" relative="1" as="geometry"><mxPoint as="offset" x="0.0" y="-13.0" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel_novel_rating_stat_tgt" value="0..1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontFamily=Microsoft YaHei;labelBackgroundColor=#FFFFFF;fontColor=#B91C1C;" vertex="1" connectable="0" parent="rel_novel_rating_stat">
+          <mxGeometry x="0.98" relative="1" as="geometry"><mxPoint as="offset" x="0.0" y="-13.0" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel_novel_ranking" value="入榜小说" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=none;endArrow=open;endFill=0;strokeWidth=1.5;fontSize=10;labelBackgroundColor=#FFFFFF;fontFamily=Microsoft YaHei;strokeColor=#9CA3AF;dashed=1;exitX=1;exitY=0.9;entryX=0;entryY=0.4;" edge="1" parent="1" source="novel" target="ranking_item">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="340" y="510" />
+              <mxPoint x="340" y="1100" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rel_novel_ranking_src" value="1..1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontFamily=Microsoft YaHei;labelBackgroundColor=#FFFFFF;fontColor=#B91C1C;" vertex="1" connectable="0" parent="rel_novel_ranking">
+          <mxGeometry x="0.02" relative="1" as="geometry"><mxPoint as="offset" x="0.0" y="-13.0" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel_novel_ranking_tgt" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontFamily=Microsoft YaHei;labelBackgroundColor=#FFFFFF;fontColor=#B91C1C;" vertex="1" connectable="0" parent="rel_novel_ranking">
+          <mxGeometry x="0.98" relative="1" as="geometry"><mxPoint as="offset" x="0.0" y="-13.0" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel_ranking_item" value="榜单条目" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=none;endArrow=open;endFill=0;strokeWidth=1.5;fontSize=10;labelBackgroundColor=#FFFFFF;fontFamily=Microsoft YaHei;strokeColor=#2563EB;exitX=0.1;exitY=1;entryX=1;entryY=0.2;" edge="1" parent="1" source="ranking_config" target="ranking_item">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1114" y="1060" />
+              <mxPoint x="920" y="1060" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="rel_ranking_item_src" value="1..1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontFamily=Microsoft YaHei;labelBackgroundColor=#FFFFFF;fontColor=#B91C1C;" vertex="1" connectable="0" parent="rel_ranking_item">
+          <mxGeometry x="0.068" relative="1" as="geometry"><mxPoint as="offset" x="13.0" y="-0.0" /></mxGeometry>
+        </mxCell>
+        <mxCell id="rel_ranking_item_tgt" value="0..*" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=10;fontStyle=1;fontFamily=Microsoft YaHei;labelBackgroundColor=#FFFFFF;fontColor=#B91C1C;" vertex="1" connectable="0" parent="rel_ranking_item">
+          <mxGeometry x="0.932" relative="1" as="geometry"><mxPoint as="offset" x="0.0" y="0.0" /></mxGeometry>
+        </mxCell>
+        <mxCell id="legend" value="&lt;b&gt;图例（UML 类图式 ER）&lt;/b&gt;&lt;br&gt;矩形 = 表：上栏表名，下栏字段；PK 主键 / FK 外键 / UK 唯一键&lt;br&gt;箭头 = 关联方向（子表 → 父表）；两端数字 = 基数（0..*、0..1、1..1）&lt;br&gt;实线 = C 内部物理外键；虚线 = A/B 外部逻辑外键&lt;br&gt;本子图 11 条关系均为二元关系，无三元及以上联系，故未使用菱形" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=12;spacingRight=12;spacingTop=8;fillColor=#FFFFFF;strokeColor=#CBD5E1;fontSize=10;fontColor=#334155;fontFamily=Microsoft YaHei;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1250" width="620" height="140" as="geometry" />
+        </mxCell>
+        <mxCell id="external_note" value="&lt;b&gt;外部依赖（不在本子图建表）&lt;/b&gt;&lt;br&gt;user_id / reply_to_user_id → app_user.user_id（A，物理外键）&lt;br&gt;novel_id → novel.novel_id（B，逻辑外键）&lt;br&gt;chapter_id → chapter.chapter_id（B，逻辑外键）&lt;br&gt;待 B 章节表与 A 的 app_user 冻结后，统一启用物理外键。&lt;br&gt;&lt;br&gt;&lt;b&gt;边界说明&lt;/b&gt;&lt;br&gt;书架/收藏、阅读进度与追更提醒统一由 A 的 user_bookshelf 维护；C 仅统计收藏量与收藏榜。&lt;br&gt;&lt;br&gt;&lt;b&gt;审核规则&lt;/b&gt;&lt;br&gt;评论展示需 audit_status=1 且 status=1；父评论不可见时回复不单独展示，记录保留。&lt;br&gt;短评 review_audit_status：NULL无短评、0待审、1通过、2驳回；仅控制短评展示，不影响 score 与 novel_rating_stat。&lt;br&gt;评论内容或评分短评修改后重新待审；业务审核状态与 D 审核日志在同一事务内更新。" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=12;spacingRight=12;spacingTop=8;fillColor=#F3F4F6;strokeColor=#9CA3AF;dashed=1;fontSize=10;fontColor=#374151;fontFamily=Microsoft YaHei;" vertex="1" parent="1">
+          <mxGeometry x="700" y="1250" width="620" height="260" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.novel.platform.modules.novel.mapper.NovelMapper">
+
+    <sql id="publicWhere">
+        WHERE n.audit_status = 1
+          AND n.status IN (0, 1)
+        <if test="status != null">
+            AND n.status = #{status}
+        </if>
+        <if test="tagId != null">
+            AND EXISTS (SELECT 1 FROM novel_tag nt
+                        WHERE nt.novel_id = n.novel_id AND nt.tag_id = #{tagId})
+        </if>
+    </sql>
+
+    <select id="selectPublicList" resultType="com.novel.platform.modules.novel.dto.NovelRow">
+        SELECT n.novel_id,
+               n.author_id,
+               n.title,
+               n.cover_url,
+               n.description,
+               n.status,
+               n.audit_status,
+               n.total_words,
+               n.latest_chapter_id,
+               c.title AS latest_chapter_title,
+               u.nickname AS author_name,
+               n.created_at,
+               n.updated_at
+        FROM novel n
+        JOIN app_user u ON u.user_id = n.author_id
+        LEFT JOIN chapter c
+               ON c.chapter_id = n.latest_chapter_id
+              AND c.status = 1
+              AND c.audit_status = 1
+        <include refid="publicWhere"/>
+        <choose>
+            <when test='sort == "words"'>ORDER BY n.total_words DESC, n.updated_at DESC</when>
+            <when test='sort == "new"'>ORDER BY n.created_at DESC</when>
+            <otherwise>ORDER BY n.updated_at DESC</otherwise>
+        </choose>
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <select id="countPublicList" resultType="long">
+        SELECT COUNT(*)
+        FROM novel n
+        <include refid="publicWhere"/>
+    </select>
+
+    <select id="searchPublic" resultType="com.novel.platform.modules.novel.dto.NovelRow">
+        SELECT n.novel_id,
+               n.author_id,
+               n.title,
+               n.cover_url,
+               n.description,
+               n.status,
+               n.audit_status,
+               n.total_words,
+               n.latest_chapter_id,
+               c.title AS latest_chapter_title,
+               u.nickname AS author_name,
+               n.created_at,
+               n.updated_at
+        FROM novel n
+        JOIN app_user u ON u.user_id = n.author_id
+        LEFT JOIN chapter c
+               ON c.chapter_id = n.latest_chapter_id
+              AND c.status = 1
+              AND c.audit_status = 1
+        WHERE n.audit_status = 1
+          AND n.status IN (0, 1)
+          AND n.title LIKE CONCAT(#{keyword}, '%')
+        <if test="tagId != null">
+            AND EXISTS (SELECT 1 FROM novel_tag nt
+                        WHERE nt.novel_id = n.novel_id AND nt.tag_id = #{tagId})
+        </if>
+        ORDER BY n.updated_at DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <select id="countSearch" resultType="long">
+        SELECT COUNT(*)
+        FROM novel n
+        WHERE n.audit_status = 1
+          AND n.status IN (0, 1)
+          AND n.title LIKE CONCAT(#{keyword}, '%')
+        <if test="tagId != null">
+            AND EXISTS (SELECT 1 FROM novel_tag nt
+                        WHERE nt.novel_id = n.novel_id AND nt.tag_id = #{tagId})
+        </if>
+    </select>
+
+    <select id="selectPublicDetail" resultType="com.novel.platform.modules.novel.dto.NovelRow">
+        SELECT n.novel_id,
+               n.author_id,
+               n.title,
+               n.cover_url,
+               n.description,
+               n.status,
+               n.audit_status,
+               n.total_words,
+               n.latest_chapter_id,
+               c.chapter_no AS latest_chapter_no,
+               c.title AS latest_chapter_title,
+               c.publish_time AS latest_chapter_publish_time,
+               u.nickname AS author_name,
+               u.avatar_url AS author_avatar_url,
+               n.created_at,
+               n.updated_at,
+               (SELECT COUNT(*) FROM chapter cc
+                 WHERE cc.novel_id = n.novel_id
+                   AND cc.status = 1
+                   AND cc.audit_status = 1) AS chapter_count
+        FROM novel n
+        JOIN app_user u ON u.user_id = n.author_id
+        LEFT JOIN chapter c
+               ON c.chapter_id = n.latest_chapter_id
+              AND c.status = 1
+              AND c.audit_status = 1
+        WHERE n.novel_id = #{novelId}
+          AND n.audit_status = 1
+          AND n.status IN (0, 1)
+    </select>
+
+    <select id="selectAuthorNovels" resultType="com.novel.platform.modules.novel.dto.NovelRow">
+        SELECT n.novel_id,
+               n.author_id,
+               n.title,
+               n.cover_url,
+               n.status,
+               n.audit_status,
+               n.total_words,
+               n.latest_chapter_id,
+               n.created_at,
+               n.updated_at,
+               (SELECT COUNT(*) FROM chapter c
+                 WHERE c.novel_id = n.novel_id
+                   AND c.status = 1) AS chapter_count
+        FROM novel n
+        WHERE n.author_id = #{authorId}
+        ORDER BY n.updated_at DESC
+        LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <select id="countAuthorNovels" resultType="long">
+        SELECT COUNT(*)
+        FROM novel
+        WHERE author_id = #{authorId}
+    </select>
+
+    <select id="selectNovelForWrite" resultType="com.novel.platform.modules.novel.dto.NovelRow">
+        SELECT novel_id,
+               author_id,
+               status,
+               audit_status,
+               total_words,
+               latest_chapter_id,
+               updated_at
+        FROM novel
+        WHERE novel_id = #{novelId}
+    </select>
+
+    <update id="updateForEdit">
+        UPDATE novel
+        SET title        = #{title},
+            cover_url    = #{coverUrl},
+            description  = #{description},
+            audit_status = 0,
+            updated_at   = NOW()
+        WHERE novel_id = #{novelId}
+    </update>
+
+</mapper>

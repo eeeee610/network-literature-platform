@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.novel.platform.modules.user.mapper.BookshelfMapper">
+
+    <resultMap id="BookshelfItemMap" type="com.novel.platform.modules.user.dto.BookshelfItem">
+        <constructor>
+            <arg column="novel_id" javaType="String"/>
+            <arg column="title" javaType="String"/>
+            <arg column="cover_url" javaType="String"/>
+            <arg column="author_id" javaType="String"/>
+            <arg column="author_name" javaType="String"/>
+            <arg column="novel_status" javaType="Integer"/>
+            <arg column="audit_status" javaType="Integer"/>
+            <arg column="last_read_chapter_id" javaType="String"/>
+            <arg column="last_read_chapter_title" javaType="String"/>
+            <arg column="last_read_at" javaType="String"/>
+            <arg column="is_top" javaType="Boolean"/>
+            <arg column="is_notify" javaType="Boolean"/>
+            <arg column="created_at" javaType="String"/>
+            <arg column="updated_at" javaType="String"/>
+            <arg column="added" javaType="Boolean"/>
+            <arg column="removed" javaType="Boolean"/>
+        </constructor>
+    </resultMap>
+
+    <sql id="BookshelfColumns">
+        b.novel_id, n.title, n.cover_url, n.author_id, u.nickname AS author_name,
+        n.status AS novel_status, n.audit_status, b.last_read_chapter_id,
+        c.title AS last_read_chapter_title,
+        DATE_FORMAT(b.last_read_at, '%Y-%m-%dT%H:%i:%s+08:00') AS last_read_at,
+        b.is_top, b.is_notify,
+        DATE_FORMAT(b.created_at, '%Y-%m-%dT%H:%i:%s+08:00') AS created_at,
+        DATE_FORMAT(b.updated_at, '%Y-%m-%dT%H:%i:%s+08:00') AS updated_at,
+        NULL AS added, NULL AS removed
+    </sql>
+
+    <sql id="BookshelfFrom">
+        FROM user_bookshelf b
+        JOIN novel n ON n.novel_id = b.novel_id
+        JOIN app_user u ON u.user_id = n.author_id
+        LEFT JOIN chapter c ON c.chapter_id = b.last_read_chapter_id
+    </sql>
+
+    <select id="selectVisibleNovelId" resultType="long">
+        SELECT novel_id FROM novel
+        WHERE novel_id = #{novelId} AND status IN (0, 1) AND audit_status = 1
+    </select>
+
+    <select id="selectItem" resultMap="BookshelfItemMap">
+        SELECT <include refid="BookshelfColumns"/>
+        <include refid="BookshelfFrom"/>
+        WHERE b.user_id = #{userId} AND b.novel_id = #{novelId}
+    </select>
+
+    <insert id="insertIgnore">
+        INSERT IGNORE INTO user_bookshelf (user_id, novel_id) VALUES (#{userId}, #{novelId})
+    </insert>
+
+    <delete id="delete">
+        DELETE FROM user_bookshelf WHERE user_id = #{userId} AND novel_id = #{novelId}
+    </delete>
+
+    <select id="countByUser" resultType="long">
+        SELECT COUNT(*) FROM user_bookshelf WHERE user_id = #{userId}
+    </select>
+
+    <select id="selectPage" resultMap="BookshelfItemMap">
+        SELECT <include refid="BookshelfColumns"/>
+        <include refid="BookshelfFrom"/>
+        WHERE b.user_id = #{userId}
+        ORDER BY b.is_top DESC, b.updated_at DESC, b.novel_id DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+</mapper>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.novel.platform.modules.admin.mapper.AdminTagMapper">
+
+    <sql id="tagFilter">
+        <where>
+            <if test="tagName != null and tagName != ''">
+                AND t.tag_name LIKE CONCAT('%', #{tagName}, '%')
+            </if>
+            <if test="isActive != null">AND t.is_active = #{isActive}</if>
+        </where>
+    </sql>
+
+    <select id="selectTags" resultType="com.novel.platform.modules.admin.dto.AdminTagRow">
+        SELECT t.tag_id, t.tag_name, t.is_active, t.created_at,
+               COUNT(nt.novel_id) AS novel_count
+        FROM tag t
+        LEFT JOIN novel_tag nt ON nt.tag_id = t.tag_id
+        <include refid="tagFilter" />
+        GROUP BY t.tag_id, t.tag_name, t.is_active, t.created_at
+        ORDER BY t.created_at DESC, t.tag_id DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countTags" resultType="long">
+        SELECT COUNT(*) FROM tag t
+        <include refid="tagFilter" />
+    </select>
+</mapper>
